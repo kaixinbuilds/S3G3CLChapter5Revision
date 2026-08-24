@@ -72,6 +72,20 @@ body.noen .en{display:none}
 #top .lv{font-weight:900;color:var(--gold);font-size:12.5px;white-space:nowrap}
 #top .prog{font-size:11px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #clock{font-size:11.5px;color:var(--dim);font-variant-numeric:tabular-nums;white-space:nowrap}
+/* 「不记分」小标：嵌在 SLS 里、但拿不到记分参数时出现（多半是老师在 Module View 预览）。
+   这种情况不该弹红色警告 —— 预览本来就不该记分。但也不能默不作声：
+   万一学生作答时看到它，那就是真的出事了，老师得看得见。
+   The not-scored chip appears when we are embedded in SLS but have no scoring
+   parameters — normally a teacher previewing in Module View. That case does not
+   deserve a red alarm, since a preview is not meant to score. It does deserve to
+   be visible: if a student ever sees this, something is genuinely wrong. */
+#noscore{font-size:10.5px;white-space:nowrap;color:#ffd98a;
+  background:rgba(255,199,44,.16);border:1px solid rgba(255,199,44,.4);
+  border-radius:7px;padding:3px 7px;cursor:help;line-height:1.3}
+#noscore .en{display:inline;font-size:9.5px;color:rgba(255,217,138,.75);margin-left:3px}
+#noscore .zh-only{display:inline}
+body.noen #noscore .zh-only{display:inline}
+@media(max-width:620px){#noscore .en{display:none}}
 .ibtn{font:inherit;font-size:13px;line-height:1;background:rgba(14,80,132,.85);color:#fff;
   border:1px solid rgba(255,199,44,.4);border-radius:7px;padding:4px 7px;cursor:pointer}
 .ibtn.off{opacity:.38}
@@ -253,6 +267,34 @@ body.py rt{visibility:visible}
 .scene{position:absolute;inset:0;z-index:0}
 .scene svg{display:block;width:100%;height:100%}
 
+/* 欢迎画面 —— 任何人打开这个游戏，第一眼看到的就是这里。
+   这个组件会上架 SLS 社群资源库给别的老师用，所以第一眼不能是一张错误讯息：
+   记分接不上是要讲，但讲法是画面里一行淡淡的提示，不是拦路的红色警告。
+   The welcome screen is the first thing anyone sees. This component goes into
+   the SLS Community Gallery for other teachers, so the first frame must not be
+   an error. A scoring problem still gets said — as a quiet line inside the
+   screen, not a red wall in front of it. */
+.welcome h1{font-size:clamp(15px,2.6vw,20px);line-height:1.4}
+.welcome .sub{font-size:12px;color:rgba(255,255,255,.8);line-height:1.65;max-width:560px}
+.lvchips{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;margin:2px 0}
+.lvchip{
+  background:rgba(255,255,255,.07);border:1px solid rgba(255,199,44,.32);border-radius:10px;
+  padding:6px 11px;min-width:118px;
+}
+.lvchip b{display:block;font-size:10px;color:var(--gold);letter-spacing:.4px}
+.lvchip span{display:block;font-size:11px;color:#fff;font-weight:700;margin:2px 0 1px;line-height:1.35}
+.lvchip small{display:block;font-size:10px;color:var(--dim)}
+.credit{font-size:10px;color:rgba(255,255,255,.42);line-height:1.6}
+
+/* 记分状态：一行淡淡的提示，不拦路 ｜ scoring status: a quiet line, never a blocker */
+.status{
+  display:flex;align-items:flex-start;gap:7px;text-align:left;max-width:580px;
+  background:rgba(255,199,44,.1);border:1px solid rgba(255,199,44,.3);border-radius:10px;
+  padding:8px 12px;font-size:11px;line-height:1.6;color:rgba(255,255,255,.8);
+}
+.status .ic{flex:0 0 auto;font-size:13px;line-height:1.3}
+.status .en{font-size:10px;color:rgba(255,255,255,.5);margin-top:1px}
+
 /* 开场的两条规矩 ｜ the two house rules on the opening screen */
 .rules{text-align:left;background:rgba(255,199,44,.1);border:1px solid rgba(255,199,44,.32);
   border-radius:10px;padding:9px 13px;max-width:600px}
@@ -359,6 +401,7 @@ var CryptoJS=(CryptoJS=CryptoJS||function(l){var t={},e=t.lib={},i=e.Base={exten
     <span class="lv" id="lvName">第一关</span>
     <span class="prog" id="prog"></span>
     <span class="sp"></span>
+    <span id="noscore" hidden>ⓘ <span class="zh-only">预览 · 不记分</span><span class="en">Preview — not scored</span></span>
     <span id="clock">⏱ 00:00</span>
     <span id="score">0 / 0</span>
     <button class="tbtn" id="enBtn" type="button" aria-pressed="true">EN</button>
@@ -385,7 +428,7 @@ var CryptoJS=(CryptoJS=CryptoJS||function(l){var t={},e=t.lib={},i=e.Base={exten
   </div>
 
   <!-- ══ 覆盖画面 ｜ overlay screens ══ -->
-  <div class="scr" id="scrWarn"></div>
+  <div class="scr" id="scrWelcome"></div>
   <div class="scr" id="scrName"></div>
   <div class="scr" id="scrAv"></div>
   <div class="scr" id="scrMenu"></div>
@@ -651,48 +694,70 @@ const LEVELS = [
    activityId。学生若另开分页，这些参数全部丢失，JSON.parse(agent) 抛出错误，
    而官方范例的 sendScore() 只在 catch 里 console.error —— 于是完全静默失败：
    游戏照常运作，学生做完，分数从未送出。
-   Why scores silently failed before: SLS passes endpoint/auth/agent/stateId/
-   activityId in the query string. Open the activity in a new tab and they are
-   all gone, JSON.parse(agent) throws, and the official sample's sendScore()
-   only console.errors in its catch — so it fails completely silently. The game
-   plays, the student finishes, and nothing is ever sent.
+   Why scores silently failed before: SLS passes the launch parameters in the
+   query string. Open the activity in a new tab and they are gone, JSON.parse
+   throws, and the official sample only console.errors in its catch — so the
+   game plays, the student finishes, and nothing is ever sent.
 
-   对策：init() 回传成功与否。失败就先显示双语警告，并给一个「仍要继续」的出口。
-   Fix: init() reports success. On failure the game shows a bilingual warning
-   first, with a "continue anyway" escape hatch. */
+   对策：init() 回传成功与否，并且<b>记下缺了哪几个参数</b>。
+   少了哪一个会写进顶栏那个小标的 tooltip，也印在 console 里 ——
+   下次再出问题，不必猜。
+   Fix: init() reports success and records WHICH parameters were missing. That
+   list goes into the top-bar chip's tooltip and the console, so the next time
+   something is wrong there is nothing to guess at.
+   ══════════════════════════════════════════════════════════════ */
 const XAPI = {
-  p:null, inSLS:false,
-  init(){
-    try{
-      const q = new URLSearchParams(location.search);
-      const ep = q.get('endpoint'), auth = q.get('auth');
-      const agent = JSON.parse(q.get('agent') || 'null');
-      const stateId = q.get('stateId'), activityId = q.get('activityId');
-      if(!ep || !auth || !agent || !stateId || !activityId) return false;
+  p:null, inSLS:false, missing:[],
+  /* 这一版是给 SLS 用的，所以「记不了分」确实是件该讲的事
+     This build is for SLS, so a scoring failure genuinely is worth mentioning */
+  everSLS:true,
+  /* 页面是不是被嵌在框里。SLS 一定是嵌着跑的 ——
+     所以「嵌着但没参数」跟「根本没嵌」是两回事，不能都当成另开分页。
+     Whether we are inside a frame. SLS always embeds, so "framed but without
+     parameters" and "not framed at all" are different situations and must not
+     both be treated as a rogue new tab. */
+  embedded:(function(){ try{ return window.self !== window.top; }catch(e){ return true; } })(),
 
-      ADL.XAPIWrapper.changeConfig({endpoint: ep + '/', auth: 'Basic ' + auth});
-      this.p = {agent, stateId, activityId};
+  init(){
+    const q = new URLSearchParams(location.search);
+    const need = ['endpoint','auth','agent','stateId','activityId'];
+    this.missing = need.filter(k => !q.get(k));
+    if(this.missing.length){
+      console.warn('[xAPI] 没有记分参数 ｜ no launch parameters. 缺 ｜ missing:',
+                   this.missing.join(', '), '| embedded:', this.embedded);
+      return false;
+    }
+    try{
+      const agent = JSON.parse(q.get('agent'));
+      if(!agent) throw new Error('agent parsed to null');
+      ADL.XAPIWrapper.changeConfig({
+        endpoint: q.get('endpoint') + '/',
+        auth: 'Basic ' + q.get('auth')
+      });
+      this.p = {agent:agent, stateId:q.get('stateId'), activityId:q.get('activityId')};
       this.inSLS = true;
+      console.log('[xAPI] 已连上 SLS ｜ connected, scores will be recorded');
       return true;
     }catch(e){
-      console.warn('xAPI init failed — not launched from inside SLS?', e);
+      this.missing = ['agent 解析失败 ｜ agent could not be parsed'];
+      console.warn('[xAPI] init failed:', e);
       return false;
     }
   },
+
   /* 送出的必须是三关的<累计总分>，不能是单次得分。
      SLS 收的是 state 文件，后写覆盖前写 —— 若只送单关分数，
      学生日后补做第三关，就会把前两关的分数一起覆盖掉。
-     Always send the RUNNING TOTAL across all three levels, never one level's
-     score. SLS stores this as a state document and a later write replaces the
-     earlier one, so sending a single level's score would wipe the rest when a
-     student comes back days later to finish level 3. */
+     Always send the RUNNING TOTAL. SLS stores this as a state document and a
+     later write replaces the earlier one, so sending one level's score would
+     wipe the others when a student returns days later to finish. */
   sendScore(score, max){
     try{
       if(!this.p) return;
       ADL.XAPIWrapper.sendState(this.p.activityId, this.p.agent, this.p.stateId, null,
         {score:score, maxScore:max, completed:true});
-      console.log('Score sent to SLS:', score + '/' + max);
-    }catch(e){ console.warn('xAPI sendScore failed:', e); }
+      console.log('[xAPI] 已送出 ｜ sent:', score + '/' + max);
+    }catch(e){ console.warn('[xAPI] sendScore failed:', e); }
   }
 };
 /* ▲▲▲ SLS-HOOK-END ▲▲▲ */
@@ -902,10 +967,20 @@ function sceneSVG(o){
     '<image href="'+AV_SRC+'" x="0" y="0" width="'+(AV_COLS*CELL_W)+'" height="'+(AV_ROWS*CELL_H)+
     '" style="image-rendering:pixelated"/></svg>';
 
-  const vb = o.zoom
-    ? [(sx-W*o.zoom*.42).toFixed(1), (sy-H*o.zoom*.30).toFixed(1),
-       (W*o.zoom).toFixed(1), (H*o.zoom).toFixed(1)].join(' ')
-    : '0 0 '+W+' '+H;
+  /* 推近山顶时，取景框要<b>夹在画面之内</b>。
+     不夹的话，框会越过右边界 —— 那一块没有东西可画，露出的是页面底色，
+     看起来就像风景旁边多了一条黑带。
+     When pushing in on the summit, the window must be clamped inside the
+     artwork. Unclamped it runs past the right edge, where there is nothing to
+     paint, and the page background shows through as a dark band beside the
+     scenery. */
+  let vb = '0 0 '+W+' '+H;
+  if(o.zoom){
+    const vw = W*o.zoom, vh = H*o.zoom;
+    const vx = Math.max(0, Math.min(W - vw, sx - vw*.42));
+    const vy = Math.max(0, Math.min(H - vh, sy - vh*.30));
+    vb = [vx.toFixed(1), vy.toFixed(1), vw.toFixed(1), vh.toFixed(1)].join(' ');
+  }
 
   return '<svg viewBox="'+vb+'" preserveAspectRatio="'+(o.fit||'xMidYMid slice')+'">' +
     '<defs>' +
@@ -1803,18 +1878,71 @@ function wakeAudioOnce(){
 }
 window.addEventListener('pointerdown', wakeAudioOnce);
 
-/* 新分页警告 —— 只有 SLS 版会走到这里 ｜ the new-tab warning: SLS build only */
-function scrWarnShow(then){
-  paintScr('scrWarn',
-    '<div class="warn">' +
-      '<h2>⚠️ 分数无法记录 ｜ Your score will not be recorded</h2>' +
-      '<p style="color:#fff">请在 SLS 中直接作答，不要另开分页，否则你的分数无法记录。</p>' +
-      '<p class="en">Please answer inside SLS. Do not open this in a new tab, or your score will not be recorded.</p>' +
+/* ──────── 欢迎画面 ｜ the welcome screen ────────
+   记分接不上时，从这里讲 —— 一行提示，按钮照样在，人照样进得去。
+   之前的做法是拦一张红色警告画面，结果老师在 SLS 里预览（Module View
+   本来就不带记分参数）一打开就吃到「分数无法记录」，像是坏了。
+   Scoring problems are said here: one line, with the button still right there.
+   The previous design put a red wall in front, so a teacher previewing in
+   Module View — which never carries launch parameters — opened the activity
+   and was told it was broken. */
+function statusNote(){
+  if(XAPI.inSLS) return '';                    // 接上了，什么都不必说 ｜ connected: say nothing
+  if(!XAPI.everSLS) return '';                 // 网页版，本来就不记分 ｜ web build: never scored
+
+  return XAPI.embedded
+    ? '<div class="status"><span class="ic">ⓘ</span><span>' +
+        '这个画面收不到 SLS 的记分参数，分数不会记录。老师在 Module View 预览时属正常现象。' +
+        '<span class="en">No scoring parameters on this frame — normal in a teacher preview. ' +
+        'Scores are recorded when a student opens the assigned activity.</span></span></div>'
+    : '<div class="status"><span class="ic">⚠️</span><span>' +
+        '你是在新分页里打开的，<b>分数不会记录</b>。想让分数算数，请回到 SLS 里作答。' +
+        '<span class="en">Opened outside SLS, so the score will not be recorded. ' +
+        'Answer inside SLS for it to count.</span></span></div>';
+}
+
+function scrWelcomeShow(){
+  const resume = !!S.name;
+  paintScr('scrWelcome',
+    '<h1>⛰️ 中三G3华文单元五《学无止境》<br>书山登顶</h1>' +
+    '<p class="sub">两篇课文，一篇先反后正，一篇先正后反。' +
+      '爬完三关，你会看出它们其实在做同一件事。' +
+      '<span class="en">Two texts, argued in opposite orders. Climb all three levels ' +
+      'and you will see they are doing the same thing.</span></p>' +
+    '<div class="lvchips">' + LEVELS.map((L,i)=>
+      '<div class="lvchip"><b>' + esc(L.n) + '</b><span>' + esc(L.t.replace(/^[^《]*/, '')) +
+      '</span><small>' + lvMax(i) + ' 分' +
+      (lvDone(i) ? ' · ✅ ' + lvScore(i) : '') + '</small></div>').join('') +
     '</div>' +
-    '<p>如果你确定要先玩，可以继续 —— 但记得回到 SLS 里再做一次。</p>' +
-    '<p class="en">You may continue anyway, but do the activity again inside SLS afterwards.</p>' +
-    '<div class="row"><button class="btn" id="wGo" type="button">仍要继续 Continue anyway</button></div>');
-  $('wGo').addEventListener('click', then);
+    '<p class="sub" style="font-size:11px">共 ' + MAX + ' 分 · 拖曳作答 · 三节课分次完成' +
+      '<span class="en">' + MAX + ' marks · drag and drop · across three lessons</span></p>' +
+    statusNote() +
+    '<div class="row"><button class="btn" id="wGo" type="button">' +
+      (resume ? '继续 Continue' : '开始 Start') + '</button></div>' +
+    '<div class="credit">郑凯欣老师 · 百德中学母语部主任<br>' +
+      'Mdm Chun Kai Xin · HOD/MTL · Bukit View Secondary School</div>',
+    {avatar: resume ? S.av : null, zoom:.62});
+  $('wGo').addEventListener('click', ()=>{
+    SFX.wake();
+    if(BGM.on && SFX.on) BGM.start();
+    resume ? scrMenuShow() : scrNameShow();
+  });
+}
+
+/* 顶栏那个「预览 · 不记分」的小标。欢迎画面上那一行讲一次，
+   进了游戏之后就靠这个小标常驻提醒 —— 免得老师预览到一半忘了这是预览。
+   The top-bar chip. The welcome screen says it once; this keeps saying it
+   quietly during play, so a teacher deep in a preview does not forget. */
+function showNoScore(){
+  const el = $('noscore');
+  if(!el) return;
+  el.hidden = false;
+  el.title = '这个画面收不到 SLS 的记分参数' +
+    (XAPI.missing && XAPI.missing.length ? '（缺：' + XAPI.missing.join('、') + '）' : '') +
+    '。\n教师在 Module View 预览时属正常现象 —— 预览本来就不记分。' +
+    '\n若学生作答时也看到这一行，请确认元件是以 Interactive Response 上传的。' +
+    '\n\nNo xAPI launch parameters on this frame. Normal in a teacher preview; ' +
+    'if students see it, check the component was uploaded as Interactive Response.';
 }
 
 function boot(){
@@ -1827,10 +1955,12 @@ function boot(){
   $('sndBtn').classList.toggle('off', !SFX.on);
   $('bgmBtn').classList.toggle('off', !BGM.on);
   CLOCK.paint();
-  const start = ()=> S.name ? scrMenuShow() : scrNameShow();
-  /* 网页版 XAPI.init() 永远回传 true，所以警告画面不会出现
-     In the web build init() always returns true, so the warning never shows */
-  XAPI.init() ? start() : scrWarnShow(start);
+  /* 不管记分接不接得上，一律从欢迎画面开始。
+     记不了分是要讲的，但那是欢迎画面里的一行字，不是挡在前面的一堵墙。
+     Always open on the welcome screen, whatever the scoring situation. A
+     scoring problem is a line of text on that screen, never a wall in front. */
+  if(!XAPI.init() && XAPI.everSLS) showNoScore();
+  scrWelcomeShow();
 }
 boot();
 </script>

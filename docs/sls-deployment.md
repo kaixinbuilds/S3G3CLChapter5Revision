@@ -57,7 +57,8 @@ The score is the **running total**: 10 after level 1, 22 after two, 36 after all
 | 状况 ｜ Symptom | 多半是 ｜ Usually |
 |---|---|
 | 后台分数一片空白<br>Gradebook column is blank | 组件不是 Interactive Response，或 Maximum Marks 还是 0<br>Wrong component type, or Maximum Marks still 0 |
-| 学生说「我做完了但没分」<br>"I finished but got nothing" | 学生另开了分页。游戏会先弹双语警告拦一次，但学生可以按「仍要继续」——请他在 SLS 里重做一遍<br>They opened it in a new tab. The game warns first, but they can continue anyway; have them redo it inside SLS |
+| 学生说「我做完了但没分」<br>"I finished but got nothing" | 学生另开了分页。欢迎画面上会有一行提示，顶栏也会挂着「不记分」的小标——请他在 SLS 里重做一遍<br>They opened it in a new tab. The welcome screen says so and a "not scored" chip sits in the top bar; have them redo it inside SLS |
+| 老师预览时看到「预览 · 不记分」<br>"Preview — not scored" during a preview | **正常**。Module View 不带记分参数，预览本来就不记分。学生开启指派的课业时不会看到<br>**Expected.** Module View carries no launch parameters, so a preview is never scored. Students opening the assigned activity do not see it |
 | 画面一片空白<br>Blank screen | 压缩档里多了一层资料夹，SLS 找不到 index.html<br>The zip has a nested folder, so SLS can't find index.html |
 | 分数卡在 99<br>Score caps at 99 | SLS 的硬性上限。本游戏满分 36，不会碰到<br>An SLS hard limit; at 36 marks this game never hits it |
 | 图片不显示 / 没有声音<br>No sprites, no sound | 档案被改动过，或不是用 build-sls.py 生成的<br>The file was hand-edited, or not produced by build-sls.py |

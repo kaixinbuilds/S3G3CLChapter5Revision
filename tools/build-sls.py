@@ -36,48 +36,70 @@ REAL = r'''/* ══════════════════════
    activityId。学生若另开分页，这些参数全部丢失，JSON.parse(agent) 抛出错误，
    而官方范例的 sendScore() 只在 catch 里 console.error —— 于是完全静默失败：
    游戏照常运作，学生做完，分数从未送出。
-   Why scores silently failed before: SLS passes endpoint/auth/agent/stateId/
-   activityId in the query string. Open the activity in a new tab and they are
-   all gone, JSON.parse(agent) throws, and the official sample's sendScore()
-   only console.errors in its catch — so it fails completely silently. The game
-   plays, the student finishes, and nothing is ever sent.
+   Why scores silently failed before: SLS passes the launch parameters in the
+   query string. Open the activity in a new tab and they are gone, JSON.parse
+   throws, and the official sample only console.errors in its catch — so the
+   game plays, the student finishes, and nothing is ever sent.
 
-   对策：init() 回传成功与否。失败就先显示双语警告，并给一个「仍要继续」的出口。
-   Fix: init() reports success. On failure the game shows a bilingual warning
-   first, with a "continue anyway" escape hatch. */
+   对策：init() 回传成功与否，并且<b>记下缺了哪几个参数</b>。
+   少了哪一个会写进顶栏那个小标的 tooltip，也印在 console 里 ——
+   下次再出问题，不必猜。
+   Fix: init() reports success and records WHICH parameters were missing. That
+   list goes into the top-bar chip's tooltip and the console, so the next time
+   something is wrong there is nothing to guess at.
+   ══════════════════════════════════════════════════════════════ */
 const XAPI = {
-  p:null, inSLS:false,
-  init(){
-    try{
-      const q = new URLSearchParams(location.search);
-      const ep = q.get('endpoint'), auth = q.get('auth');
-      const agent = JSON.parse(q.get('agent') || 'null');
-      const stateId = q.get('stateId'), activityId = q.get('activityId');
-      if(!ep || !auth || !agent || !stateId || !activityId) return false;
+  p:null, inSLS:false, missing:[],
+  /* 这一版是给 SLS 用的，所以「记不了分」确实是件该讲的事
+     This build is for SLS, so a scoring failure genuinely is worth mentioning */
+  everSLS:true,
+  /* 页面是不是被嵌在框里。SLS 一定是嵌着跑的 ——
+     所以「嵌着但没参数」跟「根本没嵌」是两回事，不能都当成另开分页。
+     Whether we are inside a frame. SLS always embeds, so "framed but without
+     parameters" and "not framed at all" are different situations and must not
+     both be treated as a rogue new tab. */
+  embedded:(function(){ try{ return window.self !== window.top; }catch(e){ return true; } })(),
 
-      ADL.XAPIWrapper.changeConfig({endpoint: ep + '/', auth: 'Basic ' + auth});
-      this.p = {agent, stateId, activityId};
+  init(){
+    const q = new URLSearchParams(location.search);
+    const need = ['endpoint','auth','agent','stateId','activityId'];
+    this.missing = need.filter(k => !q.get(k));
+    if(this.missing.length){
+      console.warn('[xAPI] 没有记分参数 ｜ no launch parameters. 缺 ｜ missing:',
+                   this.missing.join(', '), '| embedded:', this.embedded);
+      return false;
+    }
+    try{
+      const agent = JSON.parse(q.get('agent'));
+      if(!agent) throw new Error('agent parsed to null');
+      ADL.XAPIWrapper.changeConfig({
+        endpoint: q.get('endpoint') + '/',
+        auth: 'Basic ' + q.get('auth')
+      });
+      this.p = {agent:agent, stateId:q.get('stateId'), activityId:q.get('activityId')};
       this.inSLS = true;
+      console.log('[xAPI] 已连上 SLS ｜ connected, scores will be recorded');
       return true;
     }catch(e){
-      console.warn('xAPI init failed — not launched from inside SLS?', e);
+      this.missing = ['agent 解析失败 ｜ agent could not be parsed'];
+      console.warn('[xAPI] init failed:', e);
       return false;
     }
   },
+
   /* 送出的必须是三关的<累计总分>，不能是单次得分。
      SLS 收的是 state 文件，后写覆盖前写 —— 若只送单关分数，
      学生日后补做第三关，就会把前两关的分数一起覆盖掉。
-     Always send the RUNNING TOTAL across all three levels, never one level's
-     score. SLS stores this as a state document and a later write replaces the
-     earlier one, so sending a single level's score would wipe the rest when a
-     student comes back days later to finish level 3. */
+     Always send the RUNNING TOTAL. SLS stores this as a state document and a
+     later write replaces the earlier one, so sending one level's score would
+     wipe the others when a student returns days later to finish. */
   sendScore(score, max){
     try{
       if(!this.p) return;
       ADL.XAPIWrapper.sendState(this.p.activityId, this.p.agent, this.p.stateId, null,
         {score:score, maxScore:max, completed:true});
-      console.log('Score sent to SLS:', score + '/' + max);
-    }catch(e){ console.warn('xAPI sendScore failed:', e); }
+      console.log('[xAPI] 已送出 ｜ sent:', score + '/' + max);
+    }catch(e){ console.warn('[xAPI] sendScore failed:', e); }
   }
 };
 /* ▲▲▲ SLS-HOOK-END ▲▲▲ */'''

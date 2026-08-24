@@ -73,6 +73,14 @@ English is used for **chrome and navigation only**: buttons, instructions, warni
 
 Both switches persist **across pages**: set on the landing page, still set inside the game.
 
+### 开场绝不是一张错误讯息 ｜ The first frame is never an error
+
+这个组件会上架 SLS 社群资源库给别的老师用，所以**任何情况下都从欢迎画面开始** —— 标题、三关概览、开始按钮。记分接不上是要讲的，但那是画面里一行淡淡的提示，不是拦在前面的红色警告。
+
+分三种情况：参数齐全就什么都不说；**嵌在 SLS 里却没有记分参数**（老师在 Module View 预览时的正常现象）挂一行淡提示与顶栏小标；**真的另开了分页**才明说分数不会记录。之前三种全当成第三种，结果老师一预览就吃到「分数无法记录」，像是坏了。
+
+This component goes into the SLS Community Gallery, so it **always opens on a welcome screen** — title, the three levels, a start button. A scoring problem is still said, but as a quiet line inside that screen rather than a red wall in front of it. Three cases are distinguished: parameters present says nothing; **framed but unparameterised** (normal in a teacher's Module View preview) gets a quiet note and a top-bar chip; **genuinely opened outside SLS** gets a clear "this will not be recorded". All three used to be treated as the last one, so a teacher previewing was told the activity was broken.
+
 ### 登顶画面就是完成凭证 ｜ The summit screen is the proof
 
 **没有下载按钮** —— SLS 的 iframe sandbox 里下载不可靠，而且官方禁用外部函式库（html2canvas 用不了）。以装置原生截图为准；截图会把 SLS 页面一并拍进去，反而可以佐证学生确实是在登入状态下作答的。

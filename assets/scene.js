@@ -116,10 +116,20 @@ function sceneSVG(o){
     '<image href="'+AV_SRC+'" x="0" y="0" width="'+(AV_COLS*CELL_W)+'" height="'+(AV_ROWS*CELL_H)+
     '" style="image-rendering:pixelated"/></svg>';
 
-  const vb = o.zoom
-    ? [(sx-W*o.zoom*.42).toFixed(1), (sy-H*o.zoom*.30).toFixed(1),
-       (W*o.zoom).toFixed(1), (H*o.zoom).toFixed(1)].join(' ')
-    : '0 0 '+W+' '+H;
+  /* 推近山顶时，取景框要<b>夹在画面之内</b>。
+     不夹的话，框会越过右边界 —— 那一块没有东西可画，露出的是页面底色，
+     看起来就像风景旁边多了一条黑带。
+     When pushing in on the summit, the window must be clamped inside the
+     artwork. Unclamped it runs past the right edge, where there is nothing to
+     paint, and the page background shows through as a dark band beside the
+     scenery. */
+  let vb = '0 0 '+W+' '+H;
+  if(o.zoom){
+    const vw = W*o.zoom, vh = H*o.zoom;
+    const vx = Math.max(0, Math.min(W - vw, sx - vw*.42));
+    const vy = Math.max(0, Math.min(H - vh, sy - vh*.30));
+    vb = [vx.toFixed(1), vy.toFixed(1), vw.toFixed(1), vh.toFixed(1)].join(' ');
+  }
 
   return '<svg viewBox="'+vb+'" preserveAspectRatio="'+(o.fit||'xMidYMid slice')+'">' +
     '<defs>' +
@@ -164,9 +174,9 @@ function sceneSVG(o){
        hovering, because the ground left of the flag is lower. */
     (o.avatar == null ? '' : (function(){
       const ax = sx - av*1.15;
-      return cell(null, ax - av/2, curveY(far, ax) - av*CELL_H/CELL_W, av, o.avatar, 3);
+      return cell(null, ax - av/2, curveY(far, ax) - av*CELL_H/CELL_W, av, avRow(o.avatar), 3);
     })()) +
-    (o.hiker ? cell('hiker', 0, 0, H*.17, S.av, 0) : '') +
+    (o.hiker ? cell('hiker', 0, 0, H*.17, avRow(S.av), 0) : '') +
   '</svg>';
 }
 
