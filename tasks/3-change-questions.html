@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>路径 3 · 换成自己的课文 ｜ 中三G3华文单元五</title>
+<link rel="stylesheet" href="../assets/site.css">
+<script src="../assets/pinyin.js" defer></script>
+<script src="../assets/site.js" defer></script>
+</head>
+<body>
+<div class="wrap">
+<div id="langbar"></div>
+<div class="crumb">
+  <a href="../index.html"><span class="zh">← 回首页</span><span class="en">← Home</span></a>
+  <span>·</span><span class="zh">路径 3 · 换成自己的课文</span><span class="en">Path 3 · Put your own text in it</span>
+</div>
+
+<div class="card">
+  <span class="num">路径 3 · 约 1 小时 ｜ ~1 hr</span>
+  <h2 class="zh">✍️ 换成自己的课文</h2>
+  <h2 class="en">Put your own text in it</h2>
+  <p class="zh">游戏机制、计分、记分、拼音、山景全部留着，只把题目换成你的课文。</p>
+  <p class="en">Keep the mechanics, scoring, gradebook reporting, pinyin and scenery; replace only the questions.</p>
+</div>
+
+<div class="card">
+  <span class="num">1</span>
+  <h2 class="zh">先看清楚现在有什么</h2>
+  <h2 class="en">First, see what's already there</h2>
+  <p class="zh">下载这一份：12 个版面的指示、卡片、答案、干扰项、答后讲解，加上 70 条拼音，全在一页里。</p>
+  <p class="en">Download this: every instruction, card, answer, distractor and explanation across the 12 panels, plus all 70 pinyin entries.</p>
+  <div class="dl">
+    <a class="btn" href="../docs/全文校对稿.md" download>📄 全文校对稿 <span class="sub">Full text dump</span></a>
+  </div>
+  <div class="note">
+    <p class="zh">这份文件是<b>自动生成</b>的，不是另抄一份 —— 它直接从 <code>game.html</code> 读题库，所以永远等于学生看到的东西。你改完题目，跑 <code>python3 tools/dump-script.py</code> 就会重新生成一份新的。</p>
+    <p class="en">It is <b>generated</b> from <code>game.html</code> rather than maintained by hand, so it always equals what students actually see. After editing, run <code>python3 tools/dump-script.py</code> to regenerate it.</p>
+  </div>
+</div>
+
+<div class="card">
+  <span class="num">2</span>
+  <h2 class="zh">题目长什么样</h2>
+  <h2 class="en">What a question looks like</h2>
+  <p class="zh">全部在 <code>game.html</code> 的 <code>LEVELS</code> 数组里（注释写着「二、题库」）。四种版面：</p>
+  <p class="en">All in the <code>LEVELS</code> array in <code>game.html</code>, under the comment 「二、题库」. Four kinds:</p>
+  <div class="prompt">
+    <button class="btn copy" data-copy="p3">复制 Copy</button>
+    <pre id="p3">// 拖进格子 ｜ drag into slots
+{ k:'slots', cols:3, hd:'版面标题',
+  tip:{zh:'指示（华文）', en:'instruction in English'},
+  slots:[{t:'格子名', sub:'小字，可省'}],
+  cap:1,                                // 每格最多放几张 ｜ cards per slot
+  flow:'row',                           // 格子里横排，可省 ｜ optional
+  cards:[{t:'卡片文字', s:0}],          // s = 正确格子编号；-1 = 干扰项
+  e:'答后讲解' }
+
+// 多选，全对才得 1 分 ｜ multi-select, all-or-nothing
+{ k:'multi', hd:'…', tip:{zh:'…',en:'…'},
+  q:'题目', opts:[{t:'选项', ok:true}], e:'…' }
+
+// 三选一 ｜ single choice
+{ k:'choice', hd:'…', tip:{zh:'…',en:'…'},
+  q:'题目', opts:['甲','乙','丙'], a:0, e:'…' }</pre>
+  </div>
+  <div class="note warn">
+    <p class="zh"><b>改了题数就要重算总分。</b>每张可放的卡片 1 分，多选与选择题各 1 分。总分要同时改两个地方：<code>game.html</code> 里的 <code>sendScore(total(), 40)</code>，以及 SLS 组件的 Maximum Marks。两边不一致，后台分数就是错的。</p>
+    <p class="en"><b>Change the item count and you must recalculate the total.</b> Each placeable card is 1 mark; multi and choice are 1 each. Update both <code>sendScore(total(), 40)</code> in <code>game.html</code> and the SLS component's Maximum Marks — if they disagree, the gradebook is wrong.</p>
+  </div>
+</div>
+
+<div class="card">
+  <span class="num">3</span>
+  <h2 class="zh">交给 AI 改</h2>
+  <h2 class="en">Let the AI do it</h2>
+  <p class="zh">把 <code>game.html</code> 和你的课文一起上传给 Claude 或 ChatGPT，贴上这段提示语。</p>
+  <p class="en">Upload <code>game.html</code> together with your text to Claude or ChatGPT and paste this prompt.</p>
+  <div class="prompt">
+    <button class="btn copy" data-copy="p4">复制 Copy</button>
+    <pre id="p4">这是一个华文课的拖曳游戏，题库在 game.html 的 LEVELS 数组里。
+请把题目换成我附上的课文，其余一律不要动。
+
+必须遵守：
+1. 只改 LEVELS 数组和 RUBY 拼音字典，其他程式码一行都不要动。
+2. 每张可放的卡片值 1 分。改完请告诉我新的总分，并把
+   sendScore(total(), 40) 里的 40 改成新的总分。
+3. 卡片文字要短 —— 这是 450px 高的框，一张卡最多两行。
+4. 干扰项请从「另一个例子」里取，不要凭空编造：
+   要测的是学生有没有把两个例子分清楚。
+5. 拼音一律人工写进 RUBY 字典，不要用任何转换函式库。
+   特别注意多音字（好学 hào、乐在其中 lè、逆水行舟 xíng）。
+   只标课本已注音的词语就好。
+6. 指示（tip）的英文只写「怎么操作」，绝对不要翻译题目内容
+   —— 附英译等于直接给出答案。
+7. 中文引号用「」；字串里的单引号写成 \'；每题 {...} 之间别漏逗号。
+
+改完请把完整的 game.html 给我下载。</pre>
+  </div>
+  <p class="zh">拿到新档案后，跑这三行，然后自己从头玩一遍：</p>
+  <p class="en">With the new file in place, run these three and then play it through yourself:</p>
+  <div class="prompt">
+    <button class="btn copy" data-copy="p5">复制 Copy</button>
+    <pre id="p5">python3 tools/build-sls.py      # 重建 SLS 版
+python3 tools/dump-script.py    # 重建校对稿
+python3 tools/build-pinyin.py   # 网页那份拼音字典</pre>
+  </div>
+</div>
+
+<div class="card">
+  <h2 class="zh">改完自己走一遍</h2>
+  <h2 class="en">Check it yourself before class</h2>
+  <ul>
+    <li class="zh">12 个版面都打得开，卡片放得进格子</li>
+    <li class="en">Every panel opens and every card can be placed</li>
+    <li class="zh">每个版面都<b>不需要卷动</b> —— 卡片太长就分行或改短</li>
+    <li class="en">No panel needs scrolling — shorten a card if one does</li>
+    <li class="zh">全对时总分等于你设的满分，和 SLS 的 Maximum Marks 一致</li>
+    <li class="en">A perfect run equals your stated total, and matches Maximum Marks</li>
+    <li class="zh">拼音逐条看过，多音字没标错</li>
+    <li class="en">Every pinyin entry read through, heteronyms correct</li>
+    <li class="zh">iPad 上拖得动，也能「点卡片 → 点格子」</li>
+    <li class="en">Dragging works on iPad, and so does tap-card-then-tap-slot</li>
+  </ul>
+  <div class="note">
+    <p class="zh">画面卡住不动，多半是 <code>LEVELS</code> 里少了逗号或引号没关好。按 F12 → Console 看红字。</p>
+    <p class="en">A frozen screen is almost always a missing comma or unclosed quote in <code>LEVELS</code>. Press F12 → Console.</p>
+  </div>
+</div>
+<div class="center">
+  <a class="back" href="../index.html#build">
+    <span class="zh">← 回三条路径</span><span class="en">← Back to the three paths</span>
+  </a>
+</div>
+<div class="rule"></div>
+<footer>
+  <div class="zh">郑凯欣老师 · 百德中学母语部主任</div>
+  <div class="en">Mdm Chun Kai Xin · HOD/MTL · Bukit View Secondary School</div>
+  <br><a href="../README.md">README</a> · <a href="../docs/全文校对稿.md">全文校对稿</a> · MIT License
+</footer>
+</div>
+</body>
+</html>

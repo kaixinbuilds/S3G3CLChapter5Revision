@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>路径 1 · 原样拿去用 ｜ 中三G3华文单元五</title>
+<link rel="stylesheet" href="../assets/site.css">
+<script src="../assets/pinyin.js" defer></script>
+<script src="../assets/site.js" defer></script>
+</head>
+<body>
+<div class="wrap">
+<div id="langbar"></div>
+<div class="crumb">
+  <a href="../index.html"><span class="zh">← 回首页</span><span class="en">← Home</span></a>
+  <span>·</span><span class="zh">路径 1 · 原样拿去用</span><span class="en">Path 1 · Use it as it is</span>
+</div>
+
+<div class="card">
+  <span class="num">路径 1 · 约 10 分钟 ｜ ~10 min</span>
+  <h2 class="zh">🚀 原样拿去用</h2>
+  <h2 class="en">Use it as it is</h2>
+  <p class="zh">题目一个字不改。走完这一页，你会有两样东西：一个自己的网址（发给学生就能玩），和一个能自动记分的 SLS 组件。</p>
+  <p class="en">Change nothing. By the end of this page you will have two things: your own URL to hand students, and an SLS component that marks itself.</p>
+
+  <h3 class="zh">先决定你要哪一个</h3>
+  <h3 class="en">First, decide which one you need</h3>
+  <p class="zh"><b>只想让学生玩</b> —— 走 A 就够了。<b>要分数进教师后台</b> —— 走 B。两个可以都做。</p>
+  <p class="en"><b>Just want students to play?</b> A is enough. <b>Want the marks in your gradebook?</b> Do B. You can do both.</p>
+</div>
+
+<div class="card">
+  <span class="num">A</span>
+  <h2 class="zh">发一个网址给学生</h2>
+  <h2 class="en">Give students a link</h2>
+  <ol>
+    <li class="zh">开一个 GitHub 账号（免费，用学校邮箱就行）</li>
+    <li class="en">Create a free GitHub account</li>
+    <li class="zh">打开 <a href="https://github.com/kaixinbuilds/S3G3CLChapter5ArgumentativeComparison">这个 repo</a>，右上角按 <b>Fork</b> —— 这是把整份复制到你自己的账号下</li>
+    <li class="en">Open <a href="https://github.com/kaixinbuilds/S3G3CLChapter5ArgumentativeComparison">the repo</a> and press <b>Fork</b> to copy it into your own account</li>
+    <li class="zh">在你那一份里：<b>Settings → Pages</b>，Source 选 <code>main</code>，按 Save</li>
+    <li class="en">In your copy: <b>Settings → Pages</b>, set Source to <code>main</code>, Save</li>
+    <li class="zh">等一两分钟，网址会长成 <code>https://你的账号.github.io/S3G3CLChapter5ArgumentativeComparison/</code></li>
+    <li class="en">Wait a minute or two; your URL appears as <code>https://your-name.github.io/S3G3CLChapter5ArgumentativeComparison/</code></li>
+  </ol>
+  <div class="note">
+    <p class="zh"><b>要学生直接进游戏</b>，网址后面加上 <code>game.html</code>，跳过落地页。</p>
+    <p class="en"><b>To send students straight in</b>, append <code>game.html</code> and skip the landing page.</p>
+  </div>
+  <div class="note warn">
+    <p class="zh">这个版本的分数<b>不会</b>进教师后台 —— 学生只在自己画面上看到分数。要记分请走 B。</p>
+    <p class="en">This build does <b>not</b> report to any gradebook; students only see their own score. For marks, do B.</p>
+  </div>
+</div>
+
+<div class="card">
+  <span class="num">B</span>
+  <h2 class="zh">上传 SLS，分数自动进教师后台</h2>
+  <h2 class="en">Upload to SLS so the marks land by themselves</h2>
+  <ol>
+    <li class="zh">下载 <code>sls/index.html</code>（<b>不是</b> <code>game.html</code>）</li>
+    <li class="en">Download <code>sls/index.html</code> (<b>not</b> <code>game.html</code>)</li>
+    <li class="zh">压缩成 zip —— <b>只压这一个档案</b>，里面不要有资料夹</li>
+    <li class="en">Zip it — <b>the single file</b>, with no folder inside the archive</li>
+    <li class="zh">SLS 课业里：<b>Add Section → Interactive Response</b>，上传 zip</li>
+    <li class="en">In your SLS lesson: <b>Add Section → Interactive Response</b>, upload the zip</li>
+    <li class="zh"><b>Maximum Marks 设成 40</b></li>
+    <li class="en">Set <b>Maximum Marks to 40</b></li>
+    <li class="zh">用学生视角做一关，到 Learning Progress 确认分数出现了</li>
+    <li class="en">Try one level as a student and check Learning Progress</li>
+  </ol>
+  <div class="dl">
+    <a class="btn" href="../sls/index.html" download>⬇ sls/index.html <span class="sub">SLS 版</span></a>
+    <a class="btn ghost" href="../docs/sls-deployment.md">📄 完整部署说明 <span class="sub">Full guide</span></a>
+  </div>
+  <div class="note warn">
+    <p class="zh"><b>两个最常见的坑：</b>①组件选成 Text/Media —— 游戏照样能玩，但分数永远是空的。②Maximum Marks 留在预设的 0 —— 分数送出了老师也看不到。</p>
+    <p class="en"><b>The two usual failures:</b> ① choosing Text/Media instead of Interactive Response — the game plays but the score is always blank; ② leaving Maximum Marks at 0 — the score is sent but never shown.</p>
+  </div>
+</div>
+
+<div class="card">
+  <h2 class="zh">上课前跟学生说两句</h2>
+  <h2 class="en">Two things to tell students</h2>
+  <p class="zh">① <b>在 SLS 里作答，不要另开分页</b> —— 另开分页分数记录不到。游戏会先弹警告，但学生可以按「仍要继续」。</p>
+  <p class="en">① <b>Answer inside SLS, not in a new tab</b> — otherwise the score cannot be recorded. The game warns first, but they can continue anyway.</p>
+  <p class="zh">② <b>三关做完会出现登顶画面，请自行截图交到 SLS</b> —— 那是完成凭证，上面有姓名、班级、分数、用时与完成时刻。</p>
+  <p class="en">② <b>Screenshot the summit screen and submit it</b> — it carries the name, class, marks, times and finish stamp, and is the completion evidence.</p>
+  <p class="zh">这两句话游戏开场画面上也写了，但课堂上再说一次比较保险。</p>
+  <p class="en">Both appear on the game's opening screen too, but saying them aloud is safer.</p>
+</div>
+<div class="center">
+  <a class="back" href="../index.html#build">
+    <span class="zh">← 回三条路径</span><span class="en">← Back to the three paths</span>
+  </a>
+</div>
+<div class="rule"></div>
+<footer>
+  <div class="zh">郑凯欣老师 · 百德中学母语部主任</div>
+  <div class="en">Mdm Chun Kai Xin · HOD/MTL · Bukit View Secondary School</div>
+  <br><a href="../README.md">README</a> · <a href="../docs/全文校对稿.md">全文校对稿</a> · MIT License
+</footer>
+</div>
+</body>
+</html>

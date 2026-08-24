@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>路径 2 · 换角色美术 ｜ 中三G3华文单元五</title>
+<link rel="stylesheet" href="../assets/site.css">
+<script src="../assets/pinyin.js" defer></script>
+<script src="../assets/site.js" defer></script>
+</head>
+<body>
+<div class="wrap">
+<div id="langbar"></div>
+<div class="crumb">
+  <a href="../index.html"><span class="zh">← 回首页</span><span class="en">← Home</span></a>
+  <span>·</span><span class="zh">路径 2 · 换角色美术</span><span class="en">Path 2 · Change the artwork</span>
+</div>
+
+<div class="card">
+  <span class="num">路径 2 · 约 30 分钟 ｜ ~30 min</span>
+  <h2 class="zh">🎨 换角色美术</h2>
+  <h2 class="en">Change the artwork</h2>
+  <p class="zh">题目一个字不改，换掉四个角色（或整片山景），让学生在画面上看到自己学校的校服。</p>
+  <p class="en">Leave the questions alone and swap the four characters — or the whole landscape — so students see their own school on screen.</p>
+  <div class="note">
+    <p class="zh">要跑三行指令，但<b>不必看懂程序码</b>。电脑要有 Python 3（Mac 内建）与 Pillow：<code>pip3 install pillow numpy</code></p>
+    <p class="en">Three commands, no code reading. You need Python 3 (built into macOS) and Pillow: <code>pip3 install pillow numpy</code></p>
+  </div>
+</div>
+
+<div class="card">
+  <span class="num">1</span>
+  <h2 class="zh">用 AI 生成角色图</h2>
+  <h2 class="en">Generate the character art</h2>
+  <p class="zh">现在的四个角色只差在发型（短发／马尾／短鲍伯／平头）。要几个就生几张，每张一排五个姿势。把下面的提示语复制给 ChatGPT Image 或类似工具。</p>
+  <p class="en">The current four differ only in hairstyle. Generate one sheet per character, five poses in a row. Copy the prompt below into ChatGPT Image or similar.</p>
+
+  <div class="prompt">
+    <button class="btn copy" data-copy="p1">复制 Copy</button>
+    <pre id="p1">Pixel-art character sheet, one row of five poses, side view, facing right.
+
+The five poses, left to right:
+1. standing still
+2. walking, left leg forward
+3. walking, right leg forward
+4. cheering with both arms raised, jumping
+5. stumbling backwards, arms out, mouth open
+
+Character: a secondary school student in a school PE uniform —
+navy blue and white polo shirt with a collar, black shorts, white sneakers.
+Short black hair.
+
+CRITICAL requirements:
+- Solid pure magenta background, hex #FF00FF, nothing else in the background.
+- The character must be ONE connected silhouette: hair merged into the head,
+  no background-coloured line, gap, seam or outline between body parts,
+  no floating pieces. Check the neck, waist and knees especially.
+- All five poses at the SAME scale and standing on the SAME ground line.
+- Thick black outlines, flat colours, no gradients, no shadows, no text.</pre>
+  </div>
+
+  <div class="note">
+    <p class="zh"><b>洋红背景不是随便挑的。</b>角色身上不会出现这个颜色，去背时才能干净地键掉；从白色背景里分白球鞋和高光要难得多。<b>「一个完整相连的整体」也一定要写</b> —— AI 常在脖子、腰、膝盖画出背景色的细缝，去背后角色就断成好几块。</p>
+    <p class="en"><b>The magenta is deliberate:</b> nothing on the character is that colour, so it keys out cleanly — far easier than separating white shoes and highlights from a white background. <b>The "one connected silhouette" line matters too:</b> generated art loves to draw thin background-coloured seams at the neck, waist and knees, which leave the character in pieces once keyed.</p>
+  </div>
+</div>
+
+<div class="card">
+  <span class="num">2</span>
+  <h2 class="zh">换掉 art/ 里的图，跑三行指令</h2>
+  <h2 class="en">Replace the sheets in art/ and run three commands</h2>
+  <p class="zh">把生成的图放进 <code>art/</code>，档名照旧（<code>avatar-1-…</code> 到 <code>avatar-4-…</code>），然后：</p>
+  <p class="en">Drop your sheets into <code>art/</code> keeping the filenames (<code>avatar-1-…</code> through <code>avatar-4-…</code>), then:</p>
+  <div class="prompt">
+    <button class="btn copy" data-copy="p2">复制 Copy</button>
+    <pre id="p2">python3 tools/build-avatars.py
+python3 tools/embed-avatars.py
+python3 tools/build-sls.py</pre>
+  </div>
+  <p class="zh">第一行去背、缩放、拼成一张贴图；第二行贴回 <code>game.html</code>；第三行重建 SLS 版。跑完打开 <code>game.html</code> 看看。</p>
+  <p class="en">The first keys, scales and stitches the sheet; the second pastes it back into <code>game.html</code>; the third rebuilds the SLS build. Then open <code>game.html</code> and look.</p>
+  <div class="note">
+    <p class="zh"><b>四张图共用同一个缩放比例</b>，所以学生换发型时角色不会忽大忽小。这一点是脚本处理好的，你不必管。</p>
+    <p class="en">All four are scaled by <b>one shared factor</b>, so switching hairstyle never changes how big the character is. The script handles that.</p>
+  </div>
+</div>
+
+<div class="card">
+  <span class="num">3</span>
+  <h2 class="zh">想连山景一起换</h2>
+  <h2 class="en">Repainting the landscape too</h2>
+  <p class="zh">山景不是图档，是程式画出来的 SVG —— 山形、配色、云、太阳全部写在 <code>game.html</code> 里 <code>SCENE-START</code> 那一段。改完跑 <code>python3 tools/build-scene.py</code>，落地页会跟着换。</p>
+  <p class="en">The scenery is generated SVG, not an image file: hills, palette, clouds and sun all live in the <code>SCENE-START</code> block of <code>game.html</code>. Edit there, run <code>python3 tools/build-scene.py</code>, and the landing page follows.</p>
+  <table>
+    <tr><td class="zh"><b>山形</b></td><td><code>FARn</code> <code>MIDn</code> <code>NEARn</code></td>
+        <td class="zh">每个点是 [横向比例, 纵向比例]，0 是上／左，1 是下／右</td></tr>
+    <tr><td class="zh"><b>配色</b></td><td><code>sky</code> <code>far</code> <code>mid</code> <code>near</code></td>
+        <td class="zh">渐层的两个 stop-color</td></tr>
+    <tr><td class="zh"><b>旗子位置</b></td><td><code>SUMMIT</code></td><td class="zh">小路的终点也跟着它</td></tr>
+    <tr><td class="zh"><b>太阳位置</b></td><td><code>SUN</code></td><td class="zh">刻意跟旗子拉开，免得两团黄糊在一起</td></tr>
+    <tr><td class="zh"><b>小路</b></td><td><code>TRAILn</code></td><td class="zh">人物沿这条线走，改了路人就跟着改</td></tr>
+  </table>
+  <div class="note">
+    <p class="zh">山景是<b>按框的形状现画的</b>，不是固定比例的图。投影机上是一条细长带，手机上接近方形 —— 同一组座标，两边都不会被裁掉。所以改座标时用比例（0–1），不要用像素。</p>
+    <p class="en">The scenery is generated to fit its measured box, so the same coordinates work on a projector's wide ribbon and a phone's near-square frame. Keep edits in fractions (0–1), never pixels.</p>
+  </div>
+</div>
+<div class="center">
+  <a class="back" href="../index.html#build">
+    <span class="zh">← 回三条路径</span><span class="en">← Back to the three paths</span>
+  </a>
+</div>
+<div class="rule"></div>
+<footer>
+  <div class="zh">郑凯欣老师 · 百德中学母语部主任</div>
+  <div class="en">Mdm Chun Kai Xin · HOD/MTL · Bukit View Secondary School</div>
+  <br><a href="../README.md">README</a> · <a href="../docs/全文校对稿.md">全文校对稿</a> · MIT License
+</footer>
+</div>
+</body>
+</html>
