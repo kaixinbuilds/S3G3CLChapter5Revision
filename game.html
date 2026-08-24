@@ -1319,9 +1319,14 @@ function buildSlots(d){
     P.slots.push(s);
   });
 
-  /* 打散卡片 —— 不然答案就照着格子的顺序排好了
-     Shuffle: otherwise the cards sit in the same order as the slots */
-  shuffle(d.cards.map((c,i)=>({c:c,i:i}))).forEach(({c})=>{
+  /* 打散卡片。光洗一次不够 —— 洗出来刚好还是格子的顺序，机率并不低：
+     四张卡是 1/24，一班三十几个学生，总会有人拿到「照顺序拖就全对」的一手，
+     那一题就白出了。所以洗到顺序<b>不是</b>正序也不是逆序为止。
+     Shuffling once is not enough: landing back in slot order has odds of about
+     1 in 24 for a four-card panel, so in a class of thirty someone would get a
+     hand they can solve by dragging left to right without reading. Reshuffle
+     until the order is neither ascending nor descending. */
+  shuffled(d.cards).forEach(c=>{
     const e = el('div','card', zh(c.t));
     e._c = c; e._first = true;
     arm(e);
@@ -1332,6 +1337,29 @@ function buildSlots(d){
 
 function shuffle(a){
   for(let i=a.length-1;i>0;i--){ const j=(Math.random()*(i+1))|0; [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+/* 顺序是否「排好了」——正序或逆序都算。
+   正序＝照格子从左到右拖就全对；逆序＝从右到左。两种都要避开。
+   对「挑出正确的几张」那种版面，s 只有 0 与 -1 两种值，这个检查同样挡掉
+   「正确的全挤在前面／后面」。
+   Is the order 'solved'? Ascending means dragging left to right works without
+   reading; descending is the same trick backwards. For the pick-N panels, where
+   s is only 0 or -1, this equally prevents the correct cards from clumping at
+   one end. */
+function inOrder(cards){
+  const v = cards.map(c=>c.s);
+  if(new Set(v).size < 2) return false;
+  let asc = true, desc = true;
+  for(let i=1;i<v.length;i++){
+    if(v[i] < v[i-1]) asc = false;
+    if(v[i] > v[i-1]) desc = false;
+  }
+  return asc || desc;
+}
+function shuffled(cards){
+  let a = cards.slice();
+  for(let i=0;i<50 && (i===0 || inOrder(a));i++) a = shuffle(cards.slice());
   return a;
 }
 
@@ -1451,7 +1479,15 @@ function buildQuestion(d){
   box.innerHTML = '<div class="qstem">' + zh(d.q) + '</div>';
   const opts = el('div','opts');
   const multi = d.k === 'multi';
-  const list = multi ? d.opts : d.opts.map(t=>({t:t}));
+
+  /* 选项一样要打散。三选一那题的正确答案写在资料里是第一个 ——
+     不洗牌的话，学生做过一次就学会「选第一个」，这跟读懂课文毫无关系。
+     多选题同理：正确的两个本来并排在最前面。
+     Options get shuffled too. In the data the single-choice answer is written
+     first; unshuffled, a student who has seen it once learns "pick the top
+     one", which has nothing to do with understanding the text. Same for the
+     multi-select, whose two correct options sit together at the front. */
+  const list = shuffle((multi ? d.opts : d.opts.map((t,i)=>({t:t, ok:i === d.a}))).slice());
 
   list.forEach((o,i)=>{
     const b = el('button','opt',
@@ -1464,7 +1500,7 @@ function buildQuestion(d){
       const any = opts.querySelector('.opt.on');
       setGo('确定 Check', check, !!any);
     });
-    b._i = i; b._ok = multi ? o.ok : (i === d.a);
+    b._i = i; b._ok = !!o.ok;
     opts.appendChild(b);
   });
   box.appendChild(opts);
