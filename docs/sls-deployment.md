@@ -37,8 +37,21 @@ python3 tools/build-sls.py     # 重建 index.html 与 unit5sls.zip ｜ rebuilds
 
 ## 二、在 SLS 里建组件 ｜ Create the component
 
-1. 课业里 **Add Section → Interactive Response**
-   —— **一定要选 Interactive Response**。选 Text/Media 的话，游戏照样能玩，但**分数永远是空的**，这是最常见的失败原因。
+> ⚠️ **这一步选错，整个班的分数就没了，而且当下完全看不出来。**
+> 选成 **Text/Media**：游戏照样打得开，学生照样三关做到底，画面上没有任何异样 ——
+> 但**分数一个都不会记录**，教师后台永远是空的，你要等到去看成绩时才会发现。
+> 这是作者自己踩过的坑，一个班的分数。
+>
+> ⚠️ **Get this step wrong and the whole class's marks are gone, with nothing on screen to warn you.**
+> With **Text/Media** the game opens fine, students play all three levels through, and everything
+> looks normal — but **not a single mark is recorded**. The gradebook stays empty and you only find
+> out when you go looking for the marks. The author made exactly this mistake, and it cost a class.
+>
+> 官方说明 ｜ Official reference:
+> [SLS Teacher User Guide — Creating HTML5 Content for Interactive Response](https://www.learning.moe.edu.sg/teacher-user-guide/author/html5-content-development/)
+
+1. 课业里 **Question → Free-Response → Interactive Response**
+   —— 就是「自由作答题」底下那一个。**一定要选 Interactive Response**，理由见上面那一段。
 2. 上传 `unit5sls.zip`
 3. **Maximum Marks 设成 36**
    —— 就是游戏开场画面显示的满分。留在预设的 0，分数送出了老师也看不到。
@@ -47,8 +60,8 @@ python3 tools/build-sls.py     # 重建 index.html 与 unit5sls.zip ｜ rebuilds
 
 <br>
 
-1. In your lesson: **Add Section → Interactive Response**. It **must** be Interactive Response — with Text/Media the game still plays but the score is always blank, which is the single most common failure.
-2. Upload `unit5.zip`
+1. In your lesson: **Question → Free-Response → Interactive Response** — the one nested under Free-Response. It **must** be Interactive Response; the warning above says why.
+2. Upload `unit5sls.zip`
 3. Set **Maximum Marks to 36** — the number shown on the game's opening screen. Left at 0, the score is sent but never shown.
 4. Save, then try it as a student.
 
@@ -64,7 +77,7 @@ The score is the **running total**: 10 after level 1, 22 after two, 36 after all
 
 | 状况 ｜ Symptom | 多半是 ｜ Usually |
 |---|---|
-| 后台分数一片空白<br>Gradebook column is blank | 组件不是 Interactive Response，或 Maximum Marks 还是 0<br>Wrong component type, or Maximum Marks still 0 |
+| 后台分数一片空白<br>Gradebook column is blank | 组件不是 Interactive Response（多半误选了 Text/Media），或 Maximum Marks 还是 0<br>The component is not Interactive Response — usually Text/Media by mistake — or Maximum Marks is still 0 |
 | 学生说「我做完了但没分」<br>"I finished but got nothing" | 学生另开了分页。欢迎画面上会有一行提示，顶栏也会挂着「不记分」的小标——请他在 SLS 里重做一遍<br>They opened it in a new tab. The welcome screen says so and a "not scored" chip sits in the top bar; have them redo it inside SLS |
 | 老师预览时看到「预览 · 不记分」<br>"Preview — not scored" during a preview | **正常**。Module View 不带记分参数，预览本来就不记分。学生开启指派的课业时不会看到<br>**Expected.** Module View carries no launch parameters, so a preview is never scored. Students opening the assigned activity do not see it |
 | 画面一片空白<br>Blank screen | 压缩档里多了一层资料夹，SLS 找不到 index.html<br>The zip has a nested folder, so SLS can't find index.html |

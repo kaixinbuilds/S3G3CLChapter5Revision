@@ -20,7 +20,7 @@ A drag-and-drop Chinese Language game that gets Secondary 3 (G3 / lower-readines
 | **总分 ｜ Marks** | 36（第一关 10 · 第二关 12 · 第三关 14）|
 | **登顶门槛 ｜ To summit** | 24 分（65%，往上取整）｜ 24 marks (65%, rounded up) |
 | **版面 ｜ Panels** | 10 |
-| **用在哪里 ｜ Where** | SLS Interactive Response（单一组件，跨三节课）｜ one SLS component across three lessons |
+| **用在哪里 ｜ Where** | SLS Question → Free-Response → Interactive Response（单一组件，跨三节课）｜ one SLS Interactive Response component across three lessons |
 
 ---
 
@@ -130,13 +130,21 @@ The name never leaves the student's own device: it is not sent with the score an
 | **分数进不进教师后台**<br>**Scores in the gradebook** | ❌ 只在画面上<br>❌ On screen only | ✅ 自动送进 Learning Progress<br>✅ Posted automatically |
 | **内含 xAPI wrapper** | 否 ｜ No | 是，内嵌 xAPIWrapper v1.11.0 ｜ Yes, embedded inline |
 | **怎么部署 ｜ Deploy** | Settings → Pages | 上传 `unit5sls.zip` ｜ Upload `unit5sls.zip` |
+| **上传成哪种组件**<br>**Which component type** | 不适用 ｜ N/A | ⚠️ **Question → Free-Response → Interactive Response**。选成 Text/Media，游戏照玩，但**分数一分都记不到**，而且当下看不出来<br>⚠️ **Question → Free-Response → Interactive Response.** Choose Text/Media and the game still plays but **not a single mark is recorded**, with nothing on screen to show it |
 
 **内容一字不差**，差别只在于分数会不会送回 SLS。`sls/index.html` 由 `tools/build-sls.py` 从 `game.html` 生成 —— **不要手改**，改了 `game.html` 重跑脚本就好。
 
 The content is identical; only the score reporting differs. `sls/index.html` is generated from `game.html` by `tools/build-sls.py` — **never edit it by hand**; edit the game and re-run the script.
 
-> 上传 SLS 时，**Maximum Marks 要设成 36**（就是开场画面显示的满分）。SLS 对 Interactive Response 的上限是 99，不会碰到。
-> Set **Maximum Marks to 36** when uploading — the number the opening screen shows. SLS caps Interactive Response at 99, so this never hits it.
+> ⚠️ 上传 SLS 时有两件事必须做对：
+> ① 组件一定要选 **Question → Free-Response → Interactive Response**。选成 Text/Media，游戏照样打得开、学生照样三关做到底，但**分数一个都不会记录**，教师后台永远是空的 —— 而且画面上没有任何异样，你要等到去看成绩时才发现。
+> ② **Maximum Marks 要设成 36**（就是开场画面显示的满分）。留在预设的 0，分数送出了也显示不出来。SLS 对 Interactive Response 的上限是 99，不会碰到。
+> 详见 [docs/sls-deployment.md](docs/sls-deployment.md)，官方说明见 [SLS Teacher User Guide](https://www.learning.moe.edu.sg/teacher-user-guide/author/html5-content-development/)。
+>
+> ⚠️ Two things must be right on upload:
+> ① The component must be **Question → Free-Response → Interactive Response**. With Text/Media the game still opens and students still finish all three levels, but **not a single mark is recorded** and the gradebook stays empty — with nothing on screen to show it, so you find out when you go looking for the marks.
+> ② Set **Maximum Marks to 36**, the number the opening screen shows. Left at the default 0, the score is sent but never shown. SLS caps Interactive Response at 99, so this never hits it.
+> Details in [docs/sls-deployment.md](docs/sls-deployment.md); official reference: [SLS Teacher User Guide](https://www.learning.moe.edu.sg/teacher-user-guide/author/html5-content-development/).
 
 ---
 

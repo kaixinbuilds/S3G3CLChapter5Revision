@@ -53,28 +53,34 @@
   </div>
 </div>
 
-<div class="card">
+<div class="card" id="sls">
   <span class="num">B</span>
   <h2 class="zh">上传 SLS，分数自动进教师后台</h2>
   <h2 class="en">Upload to SLS so the marks land by themselves</h2>
+  <div class="note warn">
+    <p class="zh"><b>上传前先读这一段 —— 组件类型选错，整个班的分数就没了。</b></p>
+    <p class="en"><b>Read this before you upload — pick the wrong component type and the whole class's marks are gone.</b></p>
+    <p class="zh">① <b>一定要选 Question → Free-Response → Interactive Response。</b>选成 <b>Text/Media</b>，游戏照样打得开，学生照样三关做到底，画面上没有任何异样 —— 但<b>分数一个都不会记录</b>，你要等到去看成绩时才发现后台是空的。这是作者自己踩过的坑，一个班的分数。</p>
+    <p class="en">① <b>It must be Question → Free-Response → Interactive Response.</b> With <b>Text/Media</b> the game still opens and students still play all three levels through, and nothing looks wrong — but <b>not a single mark is recorded</b>. You find out when you go looking for the marks and the gradebook is empty. The author made exactly this mistake, and it cost a class.</p>
+    <p class="zh">② <b>Maximum Marks 要设成 36</b>，留在预设的 0，分数送出了老师也看不到。</p>
+    <p class="en">② <b>Set Maximum Marks to 36.</b> Left at the default 0, the score is sent but never shown.</p>
+    <p class="zh">官方说明：<a href="https://www.learning.moe.edu.sg/teacher-user-guide/author/html5-content-development/" target="_blank" rel="noopener">SLS Teacher User Guide — HTML5 Content Development</a></p>
+    <p class="en">Official reference: <a href="https://www.learning.moe.edu.sg/teacher-user-guide/author/html5-content-development/" target="_blank" rel="noopener">SLS Teacher User Guide — HTML5 Content Development</a></p>
+  </div>
+  <div class="dl">
+    <a class="btn" href="../unit5sls.zip" download>⬇ unit5sls.zip <span class="sub">直接上传 SLS</span></a>
+    <a class="btn ghost" href="../docs/sls-deployment.md">📄 完整部署说明 <span class="sub">Full guide</span></a>
+  </div>
   <ol>
     <li class="zh">下载 <code>unit5sls.zip</code>（repo 最上层，已经压好了，不必自己压）</li>
     <li class="en">Download <code>unit5sls.zip</code> from the top of the repo — already packaged</li>
-    <li class="zh">SLS 课业里：<b>Add Section → Interactive Response</b>，上传 zip</li>
-    <li class="en">In your SLS lesson: <b>Add Section → Interactive Response</b>, upload the zip</li>
+    <li class="zh">SLS 课业里：<b>Question → Free-Response → Interactive Response</b>，上传 zip</li>
+    <li class="en">In your SLS lesson: <b>Question → Free-Response → Interactive Response</b>, then upload the zip</li>
     <li class="zh"><b>Maximum Marks 设成 36</b>（游戏开场画面显示的满分）</li>
     <li class="en">Set <b>Maximum Marks to 36</b> — the number on the game's opening screen</li>
     <li class="zh">用学生视角做一关，到 Learning Progress 确认分数出现了</li>
     <li class="en">Try one level as a student and check Learning Progress</li>
   </ol>
-  <div class="dl">
-    <a class="btn" href="../unit5sls.zip" download>⬇ unit5sls.zip <span class="sub">直接上传 SLS</span></a>
-    <a class="btn ghost" href="../docs/sls-deployment.md">📄 完整部署说明 <span class="sub">Full guide</span></a>
-  </div>
-  <div class="note warn">
-    <p class="zh"><b>两个最常见的坑：</b>①组件选成 Text/Media —— 游戏照样能玩，但分数永远是空的。②Maximum Marks 留在预设的 0 —— 分数送出了老师也看不到。</p>
-    <p class="en"><b>The two usual failures:</b> ① choosing Text/Media instead of Interactive Response — the game plays but the score is always blank; ② leaving Maximum Marks at 0 — the score is sent but never shown.</p>
-  </div>
 </div>
 
 <div class="card">
