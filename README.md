@@ -4,7 +4,7 @@
 > 这份 README 的每一段都有中英文两种版本。网页版还可以一键切换「华文／双语／English」，并开关拼音。
 > Every section appears in both languages. The web version also has a 华文 / Bilingual / English switch and a pinyin toggle.
 
-**▶ 打开这里 ｜ Start here:** https://kaixinbuilds.github.io/S3G3CLChapter5ArgumentativeComparison/
+**▶ 打开这里 ｜ Start here:** https://kaixinbuilds.github.io/S3G3CLChapter5Revision/
 
 ---
 
