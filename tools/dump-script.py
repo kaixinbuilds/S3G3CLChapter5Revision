@@ -81,6 +81,9 @@ for li, lv in enumerate(LEVELS):
         kind = d.get("k")
         w("### 版面 %d · %s（%d 分）" % (pi + 1, d["hd"], pmax(d)))
         w("")
+        if d.get("src"):
+            w("**课本出处**：" + d["src"] + "　（画面上会标出来，学生不必猜要翻哪一页）")
+            w("")
         w("**指示（华文）**：" + B(d["tip"]["zh"]))
         w("")
         w("**指示（English）**：" + d["tip"]["en"])

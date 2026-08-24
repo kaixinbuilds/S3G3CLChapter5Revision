@@ -128,6 +128,18 @@ body.noen #noscore .zh-only{display:inline}
 /* ════════ 场地 ｜ the playfield ════════ */
 #field{flex:1 1 auto;position:relative;overflow:hidden;display:flex;flex-direction:column;
   gap:4px;padding:5px 10px 2px;min-height:0}
+/* 课本出处 —— 这一班找不到「现在该翻到哪一页」就会卡住，
+   所以每个版面都把课文与段落写在画面上，而不是让他们回头猜。
+   Where to look in the textbook. This class stalls when it cannot tell which
+   page it is meant to be on, so every panel names the text and the paragraph
+   on screen rather than leaving it to be guessed. */
+#src{flex:0 0 auto;text-align:center;font-size:10.5px;line-height:1.35;
+  color:#ffd98a;background:rgba(255,199,44,.12);border:1px solid rgba(255,199,44,.28);
+  border-radius:8px;padding:3px 9px;align-self:center;max-width:100%}
+#src b{color:var(--gold);font-weight:800}
+#src .en{display:inline;font-size:9.5px;color:rgba(255,217,138,.62);margin-right:5px}
+#src:empty{display:none}
+
 #tip{flex:0 0 auto;font-size:11px;color:var(--dim);text-align:center;line-height:1.4}
 #tip b{color:var(--gold);font-weight:700}
 #tip .en{font-size:10px;color:rgba(255,255,255,.44)}
@@ -227,16 +239,28 @@ body.noen #noscore .zh-only{display:inline}
    external libraries are barred, and auto-conversion always trips on
    heteronyms. A wrong pinyin in a Chinese lesson is worse than none.
 
-   关闭时用 visibility 而不是 display —— 拼音行必须一直占着位置，
-   否则一按切换钮版面就跳，学生拖到一半卡片会掉错格。
-   Toggling uses visibility, never display: the ruby line must keep its space,
-   or the layout jumps on toggle and a half-finished drag lands wrong. */
+   关掉拼音时用 display:none，让 <rt> 完全不占位置。
+   本来用的是 visibility:hidden —— 想法是让拼音行一直占着位子，按切换钮时
+   版面才不会跳。但 <rt> 隐形却仍然占宽度：「yìng」比「应」宽，
+   于是关着拼音的时候，「手机应用」中间硬生生裂开一道缝，
+   「策划义工活动」也是。而关着拼音才是预设状态 —— 为了防一个偶发的跳动，
+   把常态的中文弄成断字，这笔帐算反了。
+   版面跳动改用别的办法防：切换后重新配一次版（fitBand），
+   而且拖曳途中直接不让切换 —— 那才是当初真正担心的情况。
+   Turning pinyin off now removes <rt> entirely. It used to be hidden with
+   visibility, the idea being that the ruby line should always hold its space so
+   the layout never jumps on toggle. But an invisible <rt> still occupies WIDTH:
+   'yìng' is wider than 应, so with pinyin off a visible gap tore 手机应用 apart,
+   and 策划义工活动 with it. Pinyin off is the default state — breaking ordinary
+   Chinese apart in the common case to prevent an occasional reflow in the rare
+   one is the wrong trade. The reflow is handled where it actually matters
+   instead: re-fit after toggling, and refuse to toggle mid-drag. */
 ruby{ruby-align:center}
 rt{
   font-size:.62em;font-weight:400;color:var(--gold);letter-spacing:0;
-  line-height:1.1;visibility:hidden;
+  line-height:1.1;
 }
-body.py rt{visibility:visible}
+body:not(.py) rt{display:none}
 
 /* ════════ 覆盖画面 ｜ overlay screens ════════ */
 /* 覆盖画面：山景整片亮着，文字另外放进一个框里。
@@ -416,6 +440,7 @@ var CryptoJS=(CryptoJS=CryptoJS||function(l){var t={},e=t.lib={},i=e.Base={exten
 
   <!-- ══ 场地 ｜ playfield ══ -->
   <div id="field">
+    <div id="src"></div>
     <div id="tip"></div>
     <div id="pool"></div>
     <div id="slots"></div>
@@ -532,7 +557,7 @@ const LEVELS = [
 {
   n:'第一关', t:'生活空间《你在学什么》', cols:5,
   panels:[
-    { k:'slots', cols:5, hd:'学习的内容',
+    { k:'slots', cols:5, hd:'学习的内容', src:'生活空间《你在学什么》· 课本表格',
       tip:{zh:'五位受访者在学什么？把答案拖到对的格子里。',
            en:'What is each person learning? Drag each answer into the right box.'},
       slots:PEOPLE, cap:1,
@@ -548,7 +573,7 @@ const LEVELS = [
          bank a success before the hard panel. */
       e:'五个人的年龄从 6 岁到 76 岁，学的东西完全不同 —— 这就是「学无止境」的第一层意思。'
     },
-    { k:'slots', cols:5, hd:'对学习的看法',
+    { k:'slots', cols:5, hd:'对学习的看法', src:'生活空间《你在学什么》· 课本表格',
       tip:{zh:'他们怎么<b>看待</b>学习？把答案拖到对的格子里，这一栏要看得仔细一点。',
            en:'How does each of them see learning? Drag each answer into the right box — read carefully.'},
       slots:PEOPLE, cap:1,
@@ -569,7 +594,7 @@ const LEVELS = [
 {
   n:'第二关', t:'核心《学然后知不足》',
   panels:[
-    { k:'slots', cols:2, hd:'正反例子与论点',
+    { k:'slots', cols:2, hd:'正反例子与论点', src:'核心《学然后知不足》· 第2至3段',
       tip:{zh:'例子在前，论点在后。哪一个是<b>反面</b>例子，哪一个是<b>正面</b>例子？',
            en:'Sort the two examples, then put each claim under the example that proves it.'},
       slots:[{t:'反面例子',sub:'第2段'},{t:'正面例子',sub:'第3段'}], cap:2,
@@ -581,7 +606,7 @@ const LEVELS = [
       ],
       e:'《学然后知不足》是<b>先反后正</b>：第2段用楚国人从反面证明，第3段用芝诺从正面证明。'
     },
-    { k:'slots', cols:2, hd:'反问句判断',
+    { k:'slots', cols:2, hd:'反问句判断', src:'核心《学然后知不足》· 阅读放大镜',
       tip:{zh:'反问句<b>答案就藏在问句里</b>，不需要回答。哪几句是？',
            en:'A rhetorical question already contains its own answer. Which are which?'},
       slots:[{t:'是反问句'},{t:'不是反问句'}], cap:4,
@@ -597,7 +622,7 @@ const LEVELS = [
          item and the discriminator — a genuine question, not a rhetorical one. */
       e:'「哪里」「怎么」「何必」都带着答案。第三句的「如何……呢」是<b>真的在问</b>，作者接下来才回答，所以不是反问句。'
     },
-    { k:'slots', cols:3, hd:'篇章结构 · 本论',
+    { k:'slots', cols:3, hd:'篇章结构 · 本论', src:'核心《学然后知不足》· 全文五段',
       tip:{zh:'引论（第1段）与结论（第5段）已填好，请排出中间三段。',
            en:'The introduction and conclusion are filled in. Place the three middle paragraphs.'},
       slots:[{t:'第2段'},{t:'第3段'},{t:'第4段'}], cap:1,
@@ -608,7 +633,7 @@ const LEVELS = [
       ],
       e:'本论三段：一反、一正、再引用。三段各司其职，合起来才撑得住结论。'
     },
-    { k:'choice', hd:'第1段的修辞手法',
+    { k:'choice', hd:'第1段的修辞手法', src:'核心《学然后知不足》· 第1段',
       tip:{zh:'第1段连举雄鹰、小河、青蛙三个例子。',
            en:'Paragraph 1 lines up three images in a row.'},
       q:'第1段连举雄鹰、小河、青蛙三例，用的是什么修辞手法？',
@@ -626,7 +651,7 @@ const LEVELS = [
 {
   n:'第三关', t:'巩固《终身学习》',
   panels:[
-    { k:'slots', cols:2, hd:'正反例子与论点',
+    { k:'slots', cols:2, hd:'正反例子与论点', src:'巩固《终身学习》· 第2至3段',
       tip:{zh:'和第二关一样的做法 —— 但请留意，<b>正反的位置换了</b>。',
            en:'Same task as Level 2 — but notice the two sides have swapped.'},
       slots:[{t:'正面例子',sub:'第2段'},{t:'反面例子',sub:'第3段'}], cap:2,
@@ -638,7 +663,7 @@ const LEVELS = [
       ],
       e:'《终身学习》是<b>先正后反</b>，与《学然后知不足》刚好相反。两篇都在做同一件事：<b>对比</b>。'
     },
-    { k:'slots', cols:1, flow:'row', hd:'李光耀先生的好学表现', need:3,
+    { k:'slots', cols:1, flow:'row', hd:'李光耀先生的好学表现', need:3, src:'巩固《终身学习》· 第2段',
       tip:{zh:'从哪些方面可以看出李光耀先生的好学？拖<b>三张</b>进证据框。',
            en:'Drag the THREE cards that show his love of learning into the box.'},
       slots:[{t:'证据',sub:'三项'}], cap:3,
@@ -656,7 +681,7 @@ const LEVELS = [
          the two examples falls for them — a diagnostic distractor, not a filler. */
       e:'三个干扰项全是<b>方仲永</b>的事 —— 一正一反两个例子，不能混为一谈。'
     },
-    { k:'slots', cols:1, flow:'row', hd:'怎样具备终身学习的精神', need:4,
+    { k:'slots', cols:1, flow:'row', hd:'怎样具备终身学习的精神', need:4, src:'巩固《终身学习》· 第5段',
       tip:{zh:'第5段告诉我们该怎么做。拖<b>四张</b>正确的进框。',
            en:'Paragraph 5 says how. Drag the FOUR correct cards into the box.'},
       slots:[{t:'该怎么做',sub:'四项'}], cap:4,
@@ -670,7 +695,7 @@ const LEVELS = [
       ],
       e:'两个干扰项都是第5段<b>明白反对</b>的：「不能纸上谈兵」「不应只着眼于眼前的利益」。'
     },
-    { k:'slots', cols:3, hd:'篇章结构 · 本论',
+    { k:'slots', cols:3, hd:'篇章结构 · 本论', src:'巩固《终身学习》· 全文六段',
       tip:{zh:'引论（第1段）与结论（第6段）已填好，请排出中间三张。',
            en:'The introduction and conclusion are filled in. Place the three middle cards.'},
       slots:[{t:'第2段'},{t:'第3段'},{t:'第4至5段'}], cap:1,
@@ -1249,7 +1274,7 @@ const el = (t,c,h)=>{ const e=document.createElement(t); if(c)e.className=c;
                       if(h!=null)e.innerHTML=h; return e; };
 const esc = s => String(s).replace(/[&<>]/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
 
-const stage=$('stage'), fieldEl=$('field'), poolEl=$('pool'), slotsEl=$('slots'),
+const stage=$('stage'), fieldEl=$('field'), poolEl=$('pool'), slotsEl=$('slots'), srcEl=$('src'),
       tipEl=$('tip'), fbEl=$('fb'), goBtn=$('goBtn'),
       lvNameEl=$('lvName'), progEl=$('prog'), scoreEl=$('score');
 
@@ -1395,6 +1420,11 @@ function renderPanel(){
   progEl.innerHTML = '版面 ' + (S.pi+1) + '/' + L.panels.length +
                      ' · <b>' + esc(d.hd) + '</b>';
   scoreEl.textContent = total() + ' / ' + MAX;
+  /* 课文名以粗体标出，段落跟在后面 ｜ the text in bold, the paragraph after it */
+  $('src').innerHTML = d.src
+    ? '<span class="en">In your textbook</span>📖 ' +
+      zh(esc(d.src).replace(/^([^·]+)·/, '<b>$1</b>·'))
+    : '';
   tipEl.innerHTML = zh(d.tip.zh) + '<span class="en">' + esc(d.tip.en) + '</span>';
   poolEl.innerHTML = ''; slotsEl.innerHTML = '';
   poolEl.className = ''; slotsEl.style.gridTemplateColumns = '';
@@ -1855,6 +1885,7 @@ function setPy(on){
   S.py = on; save();
   document.body.classList.toggle('py', on);
   pyBtn.setAttribute('aria-pressed', String(on));
+  if(P) fitBand();      // 多了／少了拼音行，版面要重配 ｜ the ruby line changes the fit
 }
 function setEn(on){
   S.en = on; save();
@@ -1862,8 +1893,13 @@ function setEn(on){
   enBtn.setAttribute('aria-pressed', String(on));
   if(P) fitBand();          // 少了英文那一行，版面会松出一点 ｜ the layout gains a line back
 }
-pyBtn.addEventListener('click', ()=>setPy(!S.py));
-enBtn.addEventListener('click', ()=>setEn(!S.en));
+/* 拖到一半不给切换 —— 版面在手指底下变形，卡片就会掉错格子。
+   这正是当初改用 visibility 想避开的情况，在这里挡掉更直接。
+   Refuse to toggle mid-drag: reflowing the layout under a moving finger is how
+   a card lands in the wrong slot. This is the case the old visibility trick was
+   trying to avoid, blocked here at the source instead. */
+pyBtn.addEventListener('click', ()=>{ if(!drag) setPy(!S.py); });
+enBtn.addEventListener('click', ()=>{ if(!drag) setEn(!S.en); });
 
 $('menuBtn').addEventListener('click', scrMenuShow);
 $('sndBtn').addEventListener('click', ()=>SFX.toggle());

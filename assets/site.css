@@ -57,9 +57,13 @@ html[data-lang="en"] .zh{display:none !important}
 
 /* 拼音本身：和游戏里同一套做法 ｜ the ruby itself, same treatment as in the game */
 ruby{ruby-align:center}
-rt{font-size:.6em;font-weight:400;color:var(--gold);letter-spacing:0;line-height:1.1;
-  visibility:hidden}
-html.py rt{visibility:visible}
+/* 关掉拼音时 <rt> 完全不占位置。用 visibility 隐藏的话，注音仍然占着宽度，
+   「手机应用」中间就会裂开一道缝 —— 而关着拼音才是预设状态。
+   With pinyin off the <rt> takes no space at all. Merely hiding it leaves the
+   annotation occupying width, which tears words like 手机应用 apart in the
+   default state. */
+rt{font-size:.6em;font-weight:400;color:var(--gold);letter-spacing:0;line-height:1.1}
+html:not(.py) rt{display:none}
 .seg{display:inline-flex;background:rgba(10,58,92,.92);border:1px solid rgba(255,199,44,.38);
   border-radius:9px;overflow:hidden}
 .seg button{

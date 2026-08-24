@@ -73,6 +73,12 @@ English is used for **chrome and navigation only**: buttons, instructions, warni
 
 Both switches persist **across pages**: set on the landing page, still set inside the game.
 
+### 画面上标出课本出处 ｜ Every panel says where to look in the textbook
+
+每个版面顶上都有一行 **📖 核心《学然后知不足》· 第2至3段**。这一班找不到「现在该翻到哪一页」就会卡住 —— 与其让他们回头翻找，不如把课文与段落直接写在画面上。
+
+Every panel carries a line naming the text and the paragraph. This class stalls when it cannot tell which page it is meant to be on, so the reference sits on screen rather than being left to guess.
+
 ### 开场绝不是一张错误讯息 ｜ The first frame is never an error
 
 这个组件会上架 SLS 社群资源库给别的老师用，所以**任何情况下都从欢迎画面开始** —— 标题、三关概览、开始按钮。记分接不上是要讲的，但那是画面里一行淡淡的提示，不是拦在前面的红色警告。
