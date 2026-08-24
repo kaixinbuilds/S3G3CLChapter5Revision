@@ -1,0 +1,14 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "unit5",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "/Users/kaixinchun/Documents/github-kaixinbuilds/S3G3CLChapter5ArgumentativeComparison/tools/serve.py",
+        "8731"
+      ],
+      "port": 8731
+    }
+  ]
+}

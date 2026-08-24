@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<!--
+  ════════════════════════════════════════════════
+  落地页 ｜ Landing page
+  两道门：① 玩游戏  ② 建游戏（内含三条分层路径）
+  Two doors: ① play the game  ② build your own (three differentiated paths)
+
+  游戏本身在 game.html；SLS 版在 sls/index.html。
+  The game itself is game.html; the SLS build is sls/index.html.
+
+  页头那片山景不是另外画的插图 —— assets/scene.js 是从 game.html 抽出来的，
+  所以这里的山、云、太阳，就是学生等一下要爬的那一片。
+  The header scenery is not a separate illustration: assets/scene.js is
+  extracted from game.html, so these are literally the hills the students climb.
+  ════════════════════════════════════════════════
+-->
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>单元五《学无止境》· 学海登顶 ｜ S3 G3 Chinese Unit 5</title>
+<link rel="stylesheet" href="assets/site.css">
+<script src="assets/pinyin.js" defer></script>
+<script src="assets/scene.js" defer></script>
+<script src="assets/site.js" defer></script>
+</head>
+<body>
+<div class="wrap home">
+<div id="langbar"></div>
+</div>
+
+<div class="scene">
+  <div class="art" id="hero"></div>
+  <div class="title">
+    <span class="zh">⛰️ 单元五《学无止境》· 学海登顶</span>
+    <span class="en">Unit 5 — Learning Never Ends · Climb to the Summit</span>
+  </div>
+</div>
+
+<div class="wrap home">
+
+<div class="intro">
+  <p class="zh">一款教「对比论证法」的拖曳游戏，三关共 40 分。由一位华文老师与 AI 对话做成，不需要任何编程基础。</p>
+  <p class="en">A drag-and-drop game that teaches 对比论证法 across three levels and 40 marks — built by a Chinese Language teacher in conversation with AI, with no coding background.</p>
+</div>
+
+<!-- ══════════ 两道门 ｜ the two doors ══════════ -->
+<section id="home" class="section on">
+  <div class="doors">
+    <a class="door" href="game.html">
+      <span class="icon">🎮</span>
+      <span class="ttl zh">玩游戏</span>
+      <span class="ttl en">Play the game</span>
+      <span class="desc zh">三关 12 个版面，40 分。拖曳作答，手机、iPad、电脑都能玩。</span>
+      <span class="desc en">Three levels, 12 panels, 40 marks. Drag to answer; works on phone, iPad and computer.</span>
+      <span class="go zh">进入游戏 →</span>
+      <span class="go en">Start playing →</span>
+    </a>
+
+    <button class="door" type="button" onclick="show('build')">
+      <span class="icon">🛠️</span>
+      <span class="ttl zh">建游戏</span>
+      <span class="ttl en">Build your own</span>
+      <span class="desc zh">三条路径，对应不同的专业发展目标 —— 从「原样拿去用」到「换成自己的课文」。</span>
+      <span class="desc en">Three paths matched to different professional-development goals — from “use it as it is” to “put my own text in it”.</span>
+      <span class="go zh">选一条路径 →</span>
+      <span class="go en">Choose a path →</span>
+    </button>
+  </div>
+
+  <div class="note">
+    <p class="zh"><b>给学生的两句话：</b>请在 SLS 里作答，不要另开分页，否则分数记录不到；三关做完会出现登顶画面，请自行截图交到 SLS。</p>
+    <p class="en"><b>Two things students need to know:</b> answer inside SLS rather than in a new tab, or the score cannot be recorded; and screenshot the summit screen at the end to submit as proof.</p>
+  </div>
+</section>
+
+<!-- ══════════ 三条分层路径 ｜ the three differentiated paths ══════════ -->
+<section id="build" class="section">
+  <div class="secHead">
+    <h2 class="zh">你今天想做到哪一步？</h2>
+    <h2 class="en">How far do you want to go today?</h2>
+    <p class="zh">三条路径没有难易高下之分，请按自己的专业发展目标选一条，每条都能独立完成。</p>
+    <p class="en">The three paths aren’t ranked — pick the one that matches your own goal. Each one stands on its own.</p>
+  </div>
+
+  <div class="paths">
+    <a class="door" href="tasks/1-use-as-is.html">
+      <span class="badge zh">路径 1 · 约 10 分钟</span>
+      <span class="badge en">PATH 1 · ~10 min</span>
+      <span class="icon">🚀</span>
+      <span class="ttl zh">原样拿去用</span>
+      <span class="ttl en">Use it as it is</span>
+      <span class="desc zh">内容一个字不改，把游戏变成你自己的网址，或上传到 SLS 自动记分。</span>
+      <span class="desc en">Change nothing — publish your own copy, or upload the SLS build and let it mark itself.</span>
+      <ul>
+        <li class="zh">开一个 GitHub 账号（附步骤）</li>
+        <li class="en">Create a GitHub account (steps included)</li>
+        <li class="zh">复制 repo、开启 Pages</li>
+        <li class="en">Copy the repo, switch on Pages</li>
+        <li class="zh">上传 SLS，分数进教师后台</li>
+        <li class="en">Upload to SLS so scores reach the gradebook</li>
+      </ul>
+      <span class="go zh">开始 →</span>
+      <span class="go en">Start →</span>
+    </a>
+
+    <a class="door" href="tasks/2-change-art.html">
+      <span class="badge zh">路径 2 · 约 30 分钟</span>
+      <span class="badge en">PATH 2 · ~30 min</span>
+      <span class="icon">🎨</span>
+      <span class="ttl zh">换角色美术</span>
+      <span class="ttl en">Change the artwork</span>
+      <span class="desc zh">题目不变，把四个角色换成你们学校的校服，或换掉整片山景。</span>
+      <span class="desc en">Keep the questions; swap the four characters for your school’s uniform, or repaint the scenery.</span>
+      <ul>
+        <li class="zh">用 AI 生成五个动作的角色图</li>
+        <li class="en">Generate a 5-pose character with AI</li>
+        <li class="zh">跑一行指令拼成贴图</li>
+        <li class="en">One command stitches the sheet</li>
+        <li class="zh">山形与配色都在一处，改一次全站跟着改</li>
+        <li class="en">Hills and palette live in one place and propagate everywhere</li>
+      </ul>
+      <span class="go zh">开始 →</span>
+      <span class="go en">Start →</span>
+    </a>
+
+    <a class="door" href="tasks/3-change-questions.html">
+      <span class="badge zh">路径 3 · 约 1 小时</span>
+      <span class="badge en">PATH 3 · ~1 hr</span>
+      <span class="icon">✍️</span>
+      <span class="ttl zh">换成自己的课文</span>
+      <span class="ttl en">Put your own text in it</span>
+      <span class="desc zh">改题库、改拼音，交给 AI 生成新版本 —— 全程不必碰程序码。</span>
+      <span class="desc en">Rewrite the questions and pinyin, and let the AI rebuild the game — without touching any code.</span>
+      <ul>
+        <li class="zh">下载全文校对稿，看清楚每一题</li>
+        <li class="en">Download the proofreading dump and see every item</li>
+        <li class="zh">换成你的课文与题目</li>
+        <li class="en">Replace with your own text and questions</li>
+        <li class="zh">照抄提示语交给 AI</li>
+        <li class="en">Paste the ready-made prompt into the AI</li>
+      </ul>
+      <span class="go zh">开始 →</span>
+      <span class="go en">Start →</span>
+    </a>
+  </div>
+
+  <div class="center">
+    <button class="back" type="button" onclick="show('home')">
+      <span class="zh">← 回上一页</span><span class="en">← Back</span>
+    </button>
+  </div>
+</section>
+
+<div class="rule"></div>
+
+<footer>
+  <div class="zh">游戏设计与内容：郑凯欣老师 · 百德中学母语部主任<br>本游戏模式可自由复制、改编，欢迎标注原创来源</div>
+  <div class="en">Game design and content: Mdm Chun Kai Xin · HOD/MTL · Bukit View Secondary School<br>Free to copy and adapt; a credit back to the original is appreciated</div>
+  <br>
+  <a href="https://github.com/kaixinbuilds/S3G3CLChapter5ArgumentativeComparison">GitHub repo</a> ·
+  <a href="README.md">README</a> ·
+  <a href="docs/全文校对稿.md">全文校对稿</a> ·
+  MIT License
+</footer>
+
+</div>
+
+<script>
+// 两道门之间切换，并把选择记进网址，方便直接分享某一页
+// Switch between the doors and mirror the choice in the URL so a path can be linked directly
+function show(id){
+  document.querySelectorAll('.section').forEach(s=>s.classList.toggle('on',s.id===id));
+  history.replaceState(null,'',id==='home'?location.pathname:'#'+id);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+if(location.hash==='#build')show('build');
+
+// 页头的山景：量好页头的形状再画，转屏或改窗口都重画一次，任何尺寸都不会被裁掉
+// The header scenery is painted to the header's measured shape and repainted on
+// resize, so it never crops awkwardly at any window size.
+window.addEventListener('DOMContentLoaded',function(){
+  var hero=document.getElementById('hero'), t=null;
+  function paint(){ if(window.fitScene) fitScene(hero); }
+  paint();
+  window.addEventListener('resize',function(){clearTimeout(t);t=setTimeout(paint,160)});
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,245 @@
+/* ════════════════════════════════════════════════
+   老师页面共用样式 ｜ Shared styling for the teacher-facing pages
+   配色取自游戏本身：连绵的绿丘、蓝天、暖黄的太阳与旗子。
+   Palette lifted from the game itself: rolling green hills, blue sky, and the
+   warm yellow of the sun and the summit flag.
+   （游戏 game.html 仍是单一档案、不引用这个 CSS —— SLS sandbox 不允许外部档案）
+   (game.html stays single-file and does not use this CSS — the SLS sandbox blocks external files)
+   ════════════════════════════════════════════════ */
+
+:root{
+  --navy:#062033;          /* 页面底色 page background */
+  --panel:rgba(6,38,62,.9);
+  --panel-hi:rgba(12,62,100,.94);
+  --gold:#FFC72C;          /* 山顶的旗子 the summit flag */
+  --green:#3fae63;         /* 山丘的绿 the green of the hills */
+  --sky1:#2b8fd6;          /* 游戏天空 game sky */
+  --sky2:#cfeafb;
+  --ink:#fff;
+  --dim:rgba(255,255,255,.58);
+  --dimmer:rgba(255,255,255,.42);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--navy);color:var(--ink);
+  min-height:100vh;
+  font-family:'Microsoft YaHei','PingFang SC','Heiti SC','SimHei',sans-serif;
+  font-size:14px;line-height:1.75;
+  display:flex;flex-direction:column;align-items:center;
+  padding:0 12px 48px;
+}
+.wrap{width:100%;max-width:900px}
+.wrap.home{max-width:1060px}   /* 落地页的两道门可以宽一点 ｜ the landing page's doors get more room */
+a{color:var(--gold)}
+
+/* ════════ 语言切换 ｜ language switch ════════
+   每段文字标 .zh 或 .en；未标的（数字、程序码、档名）永远显示。
+   Every string is tagged .zh or .en; anything untagged (numbers, code, filenames) always shows. */
+html[data-lang="zh"] .en{display:none !important}
+html[data-lang="en"] .zh{display:none !important}
+
+.langbar{display:flex;justify-content:flex-end;align-items:center;gap:8px;padding:12px 2px 0}
+
+/* 拼音开关 ｜ the pinyin toggle
+   位置和语言切换并排，两个都常驻可见 —— 需要扶的学生不必先去翻设定
+   Sits beside the language switch; both stay visible, so a student who needs
+   the support never has to go hunting in a settings page for it. */
+.pytog{
+  font:inherit;font-size:12px;padding:7px 13px;border-radius:9px;cursor:pointer;
+  background:rgba(10,58,92,.92);border:1px solid rgba(255,199,44,.38);
+  color:rgba(255,255,255,.6);transition:background .12s,color .12s;
+  -webkit-tap-highlight-color:transparent;
+}
+.pytog:hover{color:#fff}
+.pytog[aria-pressed="true"]{background:var(--gold);color:#3a2600;font-weight:700}
+
+/* 拼音本身：和游戏里同一套做法 ｜ the ruby itself, same treatment as in the game */
+ruby{ruby-align:center}
+rt{font-size:.6em;font-weight:400;color:var(--gold);letter-spacing:0;line-height:1.1;
+  visibility:hidden}
+html.py rt{visibility:visible}
+.seg{display:inline-flex;background:rgba(10,58,92,.92);border:1px solid rgba(255,199,44,.38);
+  border-radius:9px;overflow:hidden}
+.seg button{
+  font:inherit;font-size:12px;padding:7px 14px;background:none;border:none;
+  color:rgba(255,255,255,.6);cursor:pointer;transition:background .12s,color .12s;
+  -webkit-tap-highlight-color:transparent;
+}
+.seg button+button{border-left:1px solid rgba(255,199,44,.22)}
+.seg button:hover{color:#fff}
+.seg button[aria-pressed="true"]{background:var(--gold);color:#3a2600;font-weight:700}
+
+/* ════════ 游戏场景当页头 ｜ the game scene as a page header ════════
+   页头用的就是游戏里那一片山景 —— assets/scene.js 是从 game.html 抽出来的，
+   所以落地页看到的山、云、太阳，和学生在游戏里看到的是同一片。
+   The header IS the game's scenery: assets/scene.js is extracted from
+   game.html, so the hills, clouds and sun on this page are literally the ones
+   the students climb. */
+.scene{
+  position:relative;
+  width:calc(100% + 24px);margin:10px -12px 0;   /* 抵销 body 两侧的 12px，做到满版 */
+  height:clamp(230px,44vh,440px);
+  border-top:2px solid var(--gold);border-bottom:2px solid var(--gold);
+  overflow:hidden;background:linear-gradient(var(--sky1) 0%,var(--sky2) 100%);
+}
+.scene .art{position:absolute;inset:0}
+.scene svg{display:block;width:100%;height:100%}
+
+/* 云会飘，太阳的光晕轻轻呼吸 —— 和游戏里同一组动画
+   Clouds drift and the sun's halo breathes: the same animation as in the game */
+.cloud{animation:drift 34s ease-in-out infinite alternate}
+.cloud.c1{animation-duration:46s;animation-delay:-8s}
+.cloud.c2{animation-duration:27s;animation-delay:-14s}
+.cloud.c3{animation-duration:52s;animation-delay:-3s}
+@keyframes drift{from{transform:translateX(-14px)}to{transform:translateX(26px)}}
+.sun{animation:breathe 7s ease-in-out infinite}
+@keyframes breathe{0%,100%{opacity:.75}50%{opacity:1}}
+@media(prefers-reduced-motion:reduce){.cloud,.sun{animation:none}}
+/* 顶部柔和压暗，让标题读得清楚 ｜ soft scrim so the title stays readable */
+/* 天空是亮的，所以标题自己带一块底，而不是把整片风景压暗
+   The sky is bright, so the title carries its own backing instead of dimming
+   the whole view the way a dark scrim would. */
+.scene .title{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2;
+  width:min(92%,760px);text-align:center;padding:14px 22px;
+  background:rgba(4,22,38,.72);border:2px solid rgba(255,199,44,.5);border-radius:16px;
+  box-shadow:0 10px 34px rgba(0,0,0,.35);
+  font-size:clamp(15px,2.4vw,26px);font-weight:900;letter-spacing:1px;color:#fff;line-height:1.5;
+}
+.scene .title .en{display:block;font-size:clamp(11px,1.2vw,15px);font-weight:700;margin-top:5px;opacity:.9}
+html[data-lang="en"] .scene .title .en{font-size:clamp(14px,2.2vw,24px);margin-top:0;opacity:1}
+/* 手机：页头收短一点，正文才不用一直往下滑 ｜ a shorter header on phones */
+/* 手机：页头收短一点，标题框也收紧 —— 但仍旧居中，别把 top 改掉，
+   否则 translate(-50%,-50%) 会把框往上抬出画面
+   Phones get a shorter header and a tighter title box, but the box stays
+   centred: overriding `top` here would let translate(-50%,-50%) lift it out
+   of the scene entirely. */
+@media(max-width:620px){
+  .scene{height:clamp(200px,32vh,270px)}
+  .scene .title{letter-spacing:0;padding:10px 14px;width:min(94%,520px)}
+}
+
+/* ════════ 页头文字 ｜ intro text ════════ */
+.intro{text-align:center;padding:20px 6px 24px}
+.intro p{font-size:13px;line-height:1.95;color:var(--dim)}
+.intro p.en{color:var(--dimmer)}
+
+@media(min-width:1100px){
+  .intro p{font-size:15px}
+  .door{padding:26px 24px}
+  .door .icon{font-size:38px}
+  .door .ttl{font-size:20px}
+  .door .desc,.door .go,.door li{font-size:13.5px}
+  .secHead h2{font-size:20px}
+  .secHead p{font-size:13.5px}
+}
+
+/* ════════ 面板与门 ｜ panels and doors ════════ */
+.doors{display:grid;gap:14px;grid-template-columns:1fr 1fr}
+.paths{display:grid;gap:14px;grid-template-columns:repeat(3,1fr)}
+@media(max-width:700px){.doors,.paths{grid-template-columns:1fr}}
+
+.door{
+  display:block;text-align:left;width:100%;font:inherit;text-decoration:none;color:var(--ink);
+  background:var(--panel);border:2px solid var(--gold);border-radius:14px;padding:20px 18px;
+  cursor:pointer;transition:transform .12s,box-shadow .12s,background .12s;
+  -webkit-tap-highlight-color:transparent;
+}
+.door:hover,.door:focus-visible{transform:translateY(-3px);background:var(--panel-hi);
+  box-shadow:0 8px 22px rgba(0,0,0,.35);outline:none}
+.door .icon{font-size:32px;line-height:1;display:block;margin-bottom:10px}
+.door .ttl{font-size:17px;font-weight:900;color:var(--gold);letter-spacing:.5px;display:block}
+.door .ttl.en{font-size:13.5px;font-weight:700;color:rgba(255,255,255,.82);margin-top:3px}
+html[data-lang="en"] .door .ttl.en{font-size:17px;font-weight:900;color:var(--gold);margin-top:0}
+.door .desc{font-size:12px;color:var(--dimmer);margin-top:10px;line-height:1.8;display:block}
+.door .go{font-size:12px;color:var(--green);font-weight:700;margin-top:12px;display:block}
+.door ul{margin:10px 0 0 16px;padding:0}
+.door li{font-size:12px;color:var(--dimmer);line-height:1.85}
+.badge{
+  display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.4px;
+  padding:3px 9px;border-radius:20px;margin-bottom:11px;
+  background:rgba(255,199,44,.14);color:var(--gold);border:1px solid rgba(255,199,44,.3)
+}
+
+/* ════════ 任务页 ｜ task pages ════════ */
+.card{
+  background:var(--panel);border:2px solid rgba(255,199,44,.45);border-radius:14px;
+  padding:20px 20px 22px;margin:14px 0;
+}
+.card > .num{
+  display:inline-block;background:var(--gold);color:#3a2600;font-weight:900;font-size:12px;
+  border-radius:20px;padding:3px 12px;margin-bottom:10px
+}
+.card h2{font-size:16.5px;color:var(--gold);font-weight:900;letter-spacing:.4px}
+.card h2.en{font-size:13px;color:rgba(255,255,255,.72);font-weight:700;margin-top:4px}
+html[data-lang="en"] .card h2.en{font-size:16.5px;color:var(--gold);font-weight:900}
+.card h3{font-size:13.5px;color:#fff;font-weight:800;margin:18px 0 5px}
+.card h3.en{font-size:12.5px;color:rgba(255,255,255,.7);font-weight:700;margin:2px 0 5px}
+html[data-lang="en"] .card h3.en{font-size:13.5px;color:#fff;font-weight:800;margin:18px 0 5px}
+.card p{font-size:13px;color:var(--dim);margin:7px 0}
+.card p.en{color:var(--dimmer)}
+html[data-lang="en"] .card p.en{color:var(--dim)}
+.card ol,.card ul{margin:8px 0 10px 20px}
+.card li{font-size:13px;color:var(--dim);margin:5px 0}
+.card li.en{color:var(--dimmer)}
+html[data-lang="en"] .card li.en{color:var(--dim)}
+.card code{
+  background:rgba(0,0,0,.32);border:1px solid rgba(255,199,44,.18);border-radius:5px;
+  padding:1px 6px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;color:#ffe08a
+}
+.note{
+  background:rgba(255,199,44,.09);border-left:3px solid var(--gold);border-radius:0 8px 8px 0;
+  padding:11px 14px;margin:12px 0;font-size:12.5px;color:var(--dim);line-height:1.9
+}
+.note.warn{background:rgba(255,110,110,.1);border-left-color:#ff8888}
+.note p{margin:2px 0;font-size:12.5px}
+
+/* ════════ 下载与复制按钮 ｜ download and copy buttons ════════ */
+.dl{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0 4px}
+.btn{
+  display:inline-flex;align-items:center;gap:8px;font:inherit;font-size:13px;font-weight:700;
+  background:linear-gradient(#FFD35C,#E8A81E);color:#3a2600;border:none;border-radius:10px;
+  padding:11px 17px;cursor:pointer;text-decoration:none;transition:filter .12s,transform .12s;
+  -webkit-tap-highlight-color:transparent;
+}
+.btn:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.btn.ghost{background:rgba(14,80,132,.85);color:#fff;border:1px solid rgba(255,199,44,.45)}
+.btn .sub{font-weight:400;font-size:11px;opacity:.75}
+
+.prompt{
+  position:relative;background:#04161f;border:1px solid rgba(255,199,44,.3);
+  border-radius:10px;padding:15px;margin:12px 0;
+}
+.prompt pre{
+  white-space:pre-wrap;word-break:break-word;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:12px;line-height:1.75;color:#d8ecff;max-height:360px;overflow:auto
+}
+.prompt .copy{position:absolute;top:10px;right:10px;font-size:11.5px;padding:7px 12px}
+
+/* ════════ 导航 ｜ navigation ════════ */
+.crumb{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:12px;color:var(--dimmer);padding:14px 2px 0}
+.crumb a{color:rgba(255,199,44,.8);text-decoration:none}
+.crumb a:hover{text-decoration:underline}
+.back{
+  display:inline-flex;align-items:center;gap:6px;margin:22px auto 0;
+  background:rgba(14,80,132,.6);border:1px solid rgba(255,199,44,.35);border-radius:9px;
+  padding:9px 16px;color:rgba(255,255,255,.78);font:inherit;font-size:12.5px;cursor:pointer;text-decoration:none
+}
+.back:hover{background:var(--panel-hi);color:#fff}
+.center{text-align:center}
+.rule{height:1px;background:rgba(255,199,44,.16);margin:26px 0}
+
+footer{margin-top:30px;text-align:center;font-size:11.5px;color:rgba(255,255,255,.32);line-height:2}
+footer a{color:rgba(255,199,44,.75);text-decoration:none}
+footer a:hover{text-decoration:underline}
+
+.section{display:none}
+.section.on{display:block;animation:fade .22s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.secHead{text-align:center;padding:6px 6px 20px}
+.secHead h2{font-size:17px;font-weight:900;color:var(--gold);letter-spacing:.5px}
+.secHead h2.en{font-size:12.5px;font-weight:700;color:rgba(255,255,255,.62);margin-top:5px}
+html[data-lang="en"] .secHead h2.en{font-size:17px;font-weight:900;color:var(--gold);margin-top:0}
+.secHead p{font-size:12px;color:var(--dimmer);margin-top:11px;line-height:1.85}
