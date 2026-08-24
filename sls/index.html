@@ -48,10 +48,17 @@ body{
   font-size:13px;line-height:1.6;
   -webkit-user-select:none;user-select:none;
   touch-action:manipulation;
+  /* 整个版面按窗口大小等比放大，倍率由 fitZoom() 算 ｜ scaled proportionally to the window; fitZoom() sets --z
+     高度维持 100% 就好：zoom 之下，百分比高度已经换算过一次，
+     再除一次会得到一半大的画面（踩过）。
+     Leave the height at 100%: under zoom, percentage heights are already
+     resolved in the zoomed space, and dividing again halves the stage. */
+  zoom:var(--z,1);
+  display:flex;align-items:center;justify-content:center;
 }
 
 /* 舞台：固定 450px 高，宽度铺满 ｜ the stage: locked to 450px, full width */
-#stage{position:relative;width:100%;height:100%;min-height:420px;max-height:100vh;overflow:hidden;
+#stage{position:relative;width:100%;height:var(--stageH,100%);min-height:420px;max-height:100%;overflow:hidden;
   display:flex;flex-direction:column}
 
 /* ════════ 双语：英文只用于系统与导航文字 ════════
@@ -1214,8 +1221,74 @@ function paintBand(){
 }
 /* 转屏、投影、键盘收起 —— 形状一变就重画，免得被裁掉
    Rotation, projector, keyboard dismissal: repaint on shape change so nothing crops */
+/* ══════════════════════════════════════════════════════════════
+   等比放大 ｜ PROPORTIONAL SCALING
+   整套版面是照着 SLS 那个 450px 高的框调出来的 —— 字级、间距、山景占多少
+   高度，全部由那个高度推出来。在 SLS 里就该保持原样，一个像素都别动。
+
+   但同一个档案在浏览器里全窗口打开，高度是 900、1000 甚至更多，
+   而字级是写死的 px：山景与格子跟着窗口按比例长大了，字却没有 ——
+   于是格子成了一个个空荡荡的大框，字小到读不清。
+   「字太小」和「作答区太大」看起来是两件事，其实是同一个原因。
+
+   对策不是重排版面，而是整体放大：body 上一个倍率，
+   字、框、山景一起变大，比例与 SLS 里一模一样，只是大了一号。
+
+   The layout was tuned against the 450px-tall SLS frame: type sizes, spacing
+   and the scenery's share of the height all follow from that one number, and
+   inside SLS it should stay exactly as it is.
+
+   But the same file opened full-window in a browser gets 900px or more of
+   height, and the type sizes are hard-coded px. The scenery and the slots grow
+   with the window; the text does not. So the slots read as big empty boxes and
+   the text reads as tiny. "Text too small" and "answer area too big" look like
+   two complaints and are one cause.
+
+   The fix is not to redesign the layout but to scale it. One zoom factor on
+   body grows text, boxes and scenery together, so the proportions stay
+   identical to the SLS build and everything is simply a size larger.
+   ══════════════════════════════════════════════════════════════ */
+const DESIGN_H = 450;   // SLS 的框高，也是整套版面的设计基准 ｜ the frame height the layout was designed against
+const DESIGN_W = 700;   // 版面要好看，宽度至少这么多 ｜ the layout needs about this much width to breathe
+const MAX_Z    = 2.6;   // 再放大只是浪费画面 ｜ beyond this it is just wasted screen
+let ZOOM = 1;
+
+function fitZoom(){
+  /* 把 700×450 当成一个盒子，塞进窗口里 —— 两个方向都要放得下，所以取较小的倍率。
+     只看高度是不行的：直立的平板高得很，倍率一冲上去，逻辑宽度就被压到 360，
+     卡片挤成好几行，卡片池自己长出卷轴 —— 试过，就是这样坏的。
+     窗口比 700 还窄时倍率留在 1，交给原本的手机版规则处理。
+
+     Fit a 700x450 box into the window: both axes have to accommodate it, so take
+     the smaller factor. Height alone does not work — a portrait tablet is tall,
+     the factor shoots up, the logical width gets squeezed to 360, cards wrap and
+     the pool grows its own scrollbar. That was the first attempt and that is how
+     it broke. Below 700px of real width the factor stays at 1 and the existing
+     mobile rules take over. */
+  ZOOM = Math.max(1, Math.min(innerWidth / DESIGN_W, innerHeight / DESIGN_H, MAX_Z));
+  document.documentElement.style.setProperty('--z', ZOOM.toFixed(4));
+
+  /* 窗口的形状不见得配得上版面的形状。直立的平板放大到宽度合适之后，
+     高度还多出一大截 —— 那些多出来的高度，本来全数落进格子里，
+     于是两个作答框长得像空房间，山景缩成一条边。
+     所以给舞台的高度设一个上限：超过的部分留白，版面比例保持不变。
+     1.3 倍是留一点呼吸的余地，又不至于让画面空掉一半。
+
+     A window's shape need not match the layout's. Scale a portrait tablet until
+     the width fits and there is still a pile of height left over, and all of it
+     used to land in the slots: two answer boxes like empty rooms and the scenery
+     squeezed to a stripe. So cap the stage height and let the surplus be margin,
+     which keeps the proportions intact. The 1.3 allows some breathing room
+     without emptying out half the screen. */
+  const logicalH = innerHeight / ZOOM;
+  const capped   = Math.min(logicalH, DESIGN_H * 1.3);
+  document.documentElement.style.setProperty('--stageH', capped.toFixed(1) + 'px');
+}
+fitZoom();
+
 let bandTimer = null;
 window.addEventListener('resize', ()=>{
+  fitZoom();
   clearTimeout(bandTimer);
   bandTimer = setTimeout(()=>{ P ? fitBand() : paintBand(); }, 160);
 });
@@ -1631,13 +1704,17 @@ function onMove(ev){
     drag.moved = true;
     const g = drag.e.cloneNode(true);
     g.classList.add('ghost');
-    g.style.width = drag.w + 'px';
+    g.style.width = (drag.w / ZOOM) + 'px';
     document.body.appendChild(g);
     drag.ghost = g;
     drag.e.style.opacity = '.3';
   }
-  drag.ghost.style.left = (ev.clientX - drag.dx) + 'px';
-  drag.ghost.style.top  = (ev.clientY - drag.dy) + 'px';
+  /* 除以倍率：clientX/Y 是视窗座标，而 body 上的 zoom 会把我们写进去的
+     数值再乘一次 —— 不除回去，卡片会飞到手指外面。
+     Divide by the zoom: clientX/Y are viewport coordinates, and body's zoom
+     multiplies whatever we set, so without this the card leaves the finger. */
+  drag.ghost.style.left = ((ev.clientX - drag.dx) / ZOOM) + 'px';
+  drag.ghost.style.top  = ((ev.clientY - drag.dy) / ZOOM) + 'px';
   hot(slotUnder(ev.clientX, ev.clientY));
 }
 
