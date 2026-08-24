@@ -281,6 +281,12 @@ body:not(.py) rt{display:none}
   scrollbar-width:thin;scrollbar-color:rgba(255,199,44,.35) transparent;
 }
 .scr.summit .box{background:rgba(4,22,38,.88);padding:10px 16px;gap:6px}
+/* 「还差一点」的框收窄，左下角的人物与右上角的旗子才看得见 ——
+   一个在山腰、一个在山顶，那段距离就是这一屏要说的话。
+   A narrower panel on the short-of-summit screen, so the character at the lower
+   left and the flag at the upper right both stay visible. The distance between
+   them is what the screen is saying. */
+#scrNear .box{max-width:min(94%,620px)}
 .scr h1{font-size:17px;font-weight:900;color:var(--gold);line-height:1.45}
 .scr h2{font-size:14px;font-weight:800;color:#fff;line-height:1.5}
 .scr p{font-size:12px;color:var(--dim);line-height:1.7;max-width:640px}
@@ -308,6 +314,10 @@ body:not(.py) rt{display:none}
 .lvchip b{display:block;font-size:10px;color:var(--gold);letter-spacing:.4px}
 .lvchip span{display:block;font-size:11px;color:#fff;font-weight:700;margin:2px 0 1px;line-height:1.35}
 .lvchip small{display:block;font-size:10px;color:var(--dim)}
+/* 最弱的一关标出来 —— 学生盯着看的就是这一格 ｜ the level to go back to */
+.lvchip.weak{border-color:#ff9b9b;background:rgba(255,140,140,.16)}
+.lvchip.weak b{color:#ffb3b3}
+.lvchip.weak small{color:#ffb3b3;font-weight:700}
 .credit{font-size:10px;color:rgba(255,255,255,.42);line-height:1.6}
 
 /* 记分状态：一行淡淡的提示，不拦路 ｜ scoring status: a quiet line, never a blocker */
@@ -451,6 +461,7 @@ body:not(.py) rt{display:none}
   <div class="scr" id="scrAv"></div>
   <div class="scr" id="scrMenu"></div>
   <div class="scr" id="scrDone"></div>
+  <div class="scr" id="scrNear"></div>
   <div class="scr summit" id="scrTop"></div>
 </div>
 
@@ -790,6 +801,27 @@ const panelMax = p => p.k==='slots' ? p.cards.filter(c=>c.s>=0).length : 1;
 const lvMax = i => LEVELS[i].panels.reduce((a,p)=>a+panelMax(p), 0);
 const MAX   = LEVELS.reduce((a,_,i)=>a+lvMax(i), 0);
 
+/* 登顶门槛：满分的 65%，往上取整。36 分 → 24 分（66.7%）。
+   宁可多算一分，也不要让「65%」这个说法名不副实。
+   一样是算出来的 —— 日后加题删题，门槛自己跟着走。
+   The summit threshold: 65% of the maximum, rounded up. 36 marks -> 24 (66.7%).
+   Rounding up rather than down keeps the claim "65%" honest. Computed like
+   everything else, so adding or removing questions moves it automatically. */
+const PASS = Math.ceil(MAX * 0.65);
+const summited = () => total() >= PASS;
+
+/* 最弱的一关，按百分比算 —— 各关满分不同，比绝对分数公平
+   The weakest level by percentage: the levels have different maximums, so a
+   raw score comparison would point at the wrong one */
+function weakestLevel(){
+  let best = 0, bestPct = 2;
+  LEVELS.forEach((_, i)=>{
+    const pct = lvScore(i) / Math.max(1, lvMax(i));
+    if(pct < bestPct){ bestPct = pct; best = i; }
+  });
+  return best;
+}
+
 /* ══════════════════════════════════════════════════════════════
    五、山景 ｜ 5. THE MOUNTAIN
    山脊只写一次，登山带与整幅山景共用同一组座标 ——
@@ -899,6 +931,27 @@ function clouds(list,W,H){
         '<ellipse cx="-13" cy="3" rx="11" ry="6"/><ellipse cx="4" cy="-6" rx="10.5" ry="7"/>' +
         '<ellipse cx="-6" cy="-4" rx="9" ry="6"/></g></g>').join('');
 }
+/* 小路上某个比例位置的座标。
+   画面上的人物是用 getPointAtLength() 从 <path> 上量的，但这里是在<b>生成</b>
+   SVG 字串，还没有 DOM 可量，所以直接把贝塞尔算出来。
+   Where a given fraction along the trail falls. The in-game character is
+   measured off the live <path> with getPointAtLength(), but here the SVG string
+   is still being generated and there is no DOM to measure, so the bezier is
+   evaluated directly. */
+function trailPoint(f, W, H){
+  const segs = TRAILn.length - 1;
+  const t = Math.max(0, Math.min(0.9999, f)) * segs;
+  const i = Math.floor(t), u = t - i;
+  const p0 = i === 0 ? [TRAILn[0][0], TRAILn[0][1]]
+                     : [TRAILn[i][4], TRAILn[i][5]];
+  const c = TRAILn[i + 1];
+  const pts = [p0, [c[0],c[1]], [c[2],c[3]], [c[4],c[5]]];
+  const m = 1 - u;
+  const x = m*m*m*pts[0][0] + 3*m*m*u*pts[1][0] + 3*m*u*u*pts[2][0] + u*u*u*pts[3][0];
+  const y = m*m*m*pts[0][1] + 3*m*m*u*pts[1][1] + 3*m*u*u*pts[2][1] + u*u*u*pts[3][1];
+  return [x*W, y*H];
+}
+
 function trailD(W,H){
   let d = 'M' + (TRAILn[0][0]*W).toFixed(1) + ',' + (TRAILn[0][1]*H).toFixed(1);
   for(let i=1;i<TRAILn.length;i++){
@@ -985,6 +1038,13 @@ function sceneSVG(o){
        the hill curve. Reusing the summit's height would leave the character
        hovering, because the ground left of the flag is lower. */
     (o.avatar == null ? '' : (function(){
+      /* avatarAt 有值就停在小路上那个位置（还没登顶），否则站在旗子旁边欢呼
+         With avatarAt the character stands partway up the trail (not yet at the
+         top); without it, it cheers beside the flag */
+      if(o.avatarAt != null){
+        const [px_, py_] = trailPoint(o.avatarAt, W, H);
+        return cell(null, px_ - av/2, py_ - av*CELL_H/CELL_W, av, avRow(o.avatar), 0);
+      }
       const ax = sx - av*1.15;
       return cell(null, ax - av/2, curveY(far, ax) - av*CELL_H/CELL_W, av, avRow(o.avatar), 3);
     })()) +
@@ -1705,10 +1765,15 @@ function scrMenuShow(){
         '</span></button>').join('') +
     '</div>' +
     '<p>目前总分 <b style="color:var(--gold)">' + total() + ' / ' + MAX + '</b>' +
+      '　' + (summited()
+        ? '<b style="color:var(--green)">已达登顶线 ' + PASS + ' 分 ✅</b>'
+        : '登顶线 <b style="color:var(--gold)">' + PASS + ' 分</b>，还差 ' +
+          '<b style="color:#ffb3b3">' + (PASS - total()) + ' 分</b>') +
       '　已用时 <b style="color:#fff">' + CLOCK.fmt(CLOCK.total()) + '</b></p>' +
     '<div class="row">' +
       '<button class="btn ghost" id="mAv" type="button">换角色 Character</button>' +
-      (all ? '<button class="btn" id="mTop" type="button">🏔️ 看登顶画面 Summit</button>' : '') +
+      (all ? '<button class="btn" id="mTop" type="button">' +
+        (summited() ? '🏔️ 看登顶画面 Summit' : '看看还差多少 How far?') + '</button>' : '') +
     '</div>');
   $('scrMenu').querySelectorAll('.lvc').forEach(b=>{
     b.addEventListener('click', ()=>{
@@ -1726,9 +1791,14 @@ function scrMenuShow(){
 function doneLevel(){
   const L = LEVELS[S.lv], sc = lvScore(S.lv), mx = lvMax(S.lv);
   SFX.level();
-  const band = sc === mx ? '全对 —— 这一关的每一张卡片你都是一次就放对的。'
+  const allDone = LEVELS.every((_,i)=>lvDone(i));
+  const band = (sc === mx ? '全对 —— 这一关的每一张卡片你都是一次就放对的。'
              : sc >= mx*0.7 ? '不错。放错的那几张，回头再看一次课文就清楚了。'
-             : '这一关可以再做一次 —— 分数会取最好的一次。';
+             : '这一关可以再做一次 —— 分数会取最好的一次。') +
+    (allDone
+      ? (summited() ? '<br>三关都做完了，也过了登顶线，可以登顶了。'
+                    : '<br>三关都做完了，离登顶线还差 <b>' + (PASS - total()) + ' 分</b>。')
+      : '<br>登顶线是 <b>' + PASS + '</b> 分，目前 <b>' + total() + '</b> 分。');
   paintScr('scrDone',
     '<h1>' + esc(L.n) + ' 完成</h1>' +
     '<h2>' + esc(L.t) + '</h2>' +
@@ -1738,7 +1808,9 @@ function doneLevel(){
     '<div class="row">' +
       '<button class="btn ghost" id="dAgain" type="button">再做一次 Retry</button>' +
       '<button class="btn" id="dNext" type="button">' +
-        (LEVELS.every((_,i)=>lvDone(i)) ? '🏔️ 登顶 Summit' : '选关 Levels') + '</button>' +
+        (LEVELS.every((_,i)=>lvDone(i))
+          ? (summited() ? '🏔️ 登顶 Summit' : '看看还差多少 How far?')
+          : '选关 Levels') + '</button>' +
     '</div>');
   $('dAgain').addEventListener('click', ()=>{ S.pi = 0; renderPanel(); });
   $('dNext').addEventListener('click', ()=>{
@@ -1754,7 +1826,62 @@ function doneLevel(){
    external libraries are barred, so html2canvas is out. The device's own
    screenshot is the mechanism — and it catches the surrounding SLS page too,
    which is itself evidence the student was logged in. */
+/* ──────── 还差一点 ｜ short of the summit ────────
+   三关都做完，但总分不到门槛。人物停在小路上，没到旗子。
+   给的是一条明路：哪一关最弱、还差几分、一个按钮直接重做那一关。
+   重做取最好的一次，所以再试一定不亏 —— 这一点要写在画面上，
+   不然学生会以为重做可能把分数弄低。
+   All three levels done but short of the threshold. The character stands on the
+   trail, not at the flag. What it gives is a way forward: which level is
+   weakest, how many marks short, and a button straight into that level. Retries
+   keep the best attempt, so trying again can never cost anything — which has to
+   be said on screen, or students assume a retry might lower their score. */
+function scrNearShow(){
+  const w = weakestLevel(), gap = PASS - total();
+  paintScr('scrNear',
+    '<h1>⛰️ 还差一点就到顶了</h1>' +
+    '<p class="sub" style="font-size:13px;color:#fff">目前 <b style="color:var(--gold)">' +
+      total() + ' / ' + MAX + '</b>　·　登顶需要 <b style="color:var(--gold)">' + PASS +
+      ' 分</b>，还差 <b style="color:#ffb3b3">' + gap + ' 分</b></p>' +
+    '<div class="lvchips">' + LEVELS.map((L,i)=>
+      '<div class="lvchip' + (i===w ? ' weak' : '') + '"><b>' + esc(L.n) + '</b>' +
+      '<span>' + lvScore(i) + ' / ' + lvMax(i) + '</span>' +
+      '<small>' + (i===w ? '最弱的一关' : Math.round(lvScore(i)/Math.max(1,lvMax(i))*100) + '%') +
+      '</small></div>').join('') + '</div>' +
+    '<p class="sub" style="font-size:11px">重做取<b>最好的一次</b>成绩 —— 再试一次不会把分数弄低。' +
+      '<span class="en">A retry keeps your best attempt, so trying again can never lower your score.</span></p>' +
+    '<div class="row">' +
+      '<button class="btn" id="nRetry" type="button">重做' + esc(LEVELS[w].n) + ' Retry</button>' +
+      '<button class="btn ghost" id="nMenu" type="button">自由选关 Levels</button>' +
+    '</div>',
+    /* 人物摆在小路靠下的那一段。照 total/MAX 的真实比例摆的话，
+       多数分数刚好落在文字框後面，等于没画。这一格是气氛，不是读数 ——
+       差多少分，上面那行字已经写得清清楚楚。
+       The character sits on the lower stretch of the trail. Placed at the true
+       total/MAX fraction it lands behind the text panel for most scores, which
+       is the same as not drawing it. This is atmosphere, not a readout: the gap
+       is stated in words directly above. */
+    /* 这一屏<b>不</b>推近山顶。推近了，山腰上的人物就被裁到画面外，
+       只剩一面旗子 —— 而这一屏要说的正是「人在这里、旗子在那里」。
+       整片山景摆着，两个都看得见，中间那段距离自己会说话。
+       人物摆在文字框下方那一条看得见的带子里 —— 450px 的框，文字框几乎占满
+       中间，再往上摆就又被盖住了。
+       This screen does NOT push in on the summit. Zoomed in, the character on
+       the lower slope falls outside the frame and only the flag remains — but
+       the whole point here is "you are here, the flag is there". The full scene
+       keeps both in view and the distance between them speaks for itself. */
+    {avatar:S.av, avatarAt: .05 + .13 * Math.min(1, total()/PASS)});
+  $('nRetry').addEventListener('click', ()=>{ S.lv = w; S.pi = 0; renderPanel(); });
+  $('nMenu').addEventListener('click', scrMenuShow);
+}
+
 function scrTopShow(){
+  /* 唯一的一道闸 —— 所有通往登顶画面的路都从这里过，
+     漏掉任何一条，凭证就发给了不该拿到的人。
+     The single gate: every route to the summit screen comes through here.
+     Miss one and the certificate goes to someone who has not earned it. */
+  if(!summited()) return scrNearShow();
+
   const now = new Date();
   const stampNow = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' +
     String(now.getDate()).padStart(2,'0') + ' ' + String(now.getHours()).padStart(2,'0') +
@@ -1886,8 +2013,9 @@ function scrWelcomeShow(){
       '</span><small>' + lvMax(i) + ' 分' +
       (lvDone(i) ? ' · ✅ ' + lvScore(i) : '') + '</small></div>').join('') +
     '</div>' +
-    '<p class="sub" style="font-size:11px">共 ' + MAX + ' 分 · 拖曳作答 · 三节课分次完成' +
-      '<span class="en">' + MAX + ' marks · drag and drop · across three lessons</span></p>' +
+    '<p class="sub" style="font-size:11px">共 ' + MAX + ' 分 · 拿到 <b style="color:var(--gold)">' +
+      PASS + ' 分</b>就能登顶 · 三节课分次完成' +
+      '<span class="en">' + MAX + ' marks · reach ' + PASS + ' to summit · across three lessons</span></p>' +
     statusNote() +
     '<div class="row"><button class="btn" id="wGo" type="button">' +
       (resume ? '继续 Continue' : '开始 Start') + '</button></div>' +

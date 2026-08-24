@@ -85,3 +85,11 @@ def level_max(lv):
 
 def total_max(levels):
     return sum(level_max(l) for l in levels)
+
+
+def pass_mark(levels, frac=0.65):
+    """登顶门槛：满分的 65%，往上取整。与 game.html 里的 PASS 同一条算式。
+       The summit threshold: 65% of the maximum, rounded up — the same
+       expression as PASS in game.html."""
+    import math
+    return math.ceil(total_max(levels) * frac)

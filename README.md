@@ -18,6 +18,7 @@ A drag-and-drop Chinese Language game that gets Secondary 3 (G3 / lower-readines
 |---|---|
 | **课文 ｜ Texts** | 生活空间《你在学什么》· 核心《学然后知不足》· 巩固《终身学习》 |
 | **总分 ｜ Marks** | 36（第一关 10 · 第二关 12 · 第三关 14）|
+| **登顶门槛 ｜ To summit** | 24 分（65%，往上取整）｜ 24 marks (65%, rounded up) |
 | **版面 ｜ Panels** | 10 |
 | **用在哪里 ｜ Where** | SLS Interactive Response（单一组件，跨三节课）｜ one SLS component across three lessons |
 
@@ -44,6 +45,20 @@ The closing screen is where it lands: one text goes negative-then-positive, the 
 每张卡片**第一次就放对**才得 1 分。放错的卡片轻弹回原位，人物滑一跤再自己站起来 —— **不扣分、不设生命值**，学生可以一直试到对为止，所以人人都走得完全程。但分数记的是第一次的判断，教师后台那个数字才有诊断价值。
 
 A card scores only if it is placed correctly on the **first** try. A wrong drop springs back and the character stumbles and gets up — **no penalty, no lives** — so every student finishes. But the mark reflects the first judgement, which is what makes the gradebook number worth reading. Without this, everyone eventually scores 40/40 and the number means nothing.
+
+### 登顶要 65% ｜ Summiting takes 65%
+
+三关做完还不够 —— **总分要达到 24 分（36 的 65%，往上取整）才能登顶**。达标才看得到登顶画面，也就是那张要截图交给老师的凭证。
+
+未达标的学生看到的是「还差一点」：目前几分、还差几分、**哪一关最弱**（按百分比算，因为三关满分不同），以及一个直接重做那一关的按钮。没有可以交的凭证 —— 重做本身就是要补的那一课。
+
+因为重做取最好的一次成绩，这道门槛**人人过得了**：它是「练到会为止」，不是筛选。这一点画面上有明写，否则学生会以为重做可能把分数弄低而不敢试。分数不论达标与否都照常送进 SLS，教师后台看得到真实进度。
+
+门槛是**算出来**的（`Math.ceil(MAX * 0.65)`），日后加题删题会自己跟着走。
+
+Finishing all three levels is not enough: the total must reach **24 of 36 (65%, rounded up)** before the summit screen — the certificate students screenshot — appears at all. Below that they get a "还差一点" screen naming how many marks short they are and **which level is weakest** (by percentage, since the levels have different maximums), with a button straight into it. There is nothing to submit, because the retry *is* the lesson.
+
+Since retries keep the best attempt, **everyone can pass this gate**: it is practise-until-you-have-it, not a filter. The screen says so explicitly, or students assume a retry might lower their score and won't risk it. The mark still posts to SLS either way, so the gradebook shows real progress. The threshold is computed, so adding or removing questions moves it automatically.
 
 ### 干扰项是诊断，不是填充 ｜ Distractors that diagnose
 
