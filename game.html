@@ -400,6 +400,14 @@ body:not(.py) rt{display:none}
   font-variant-numeric:tabular-nums;padding-left:10px}
 .sheet tr.hd td{font-size:9.5px;color:rgba(255,255,255,.4);font-weight:700;
   border-bottom:1px solid rgba(255,255,255,.14);padding-bottom:3px}
+/* 首次那一栏：与「最好」相同就淡下去，不同才亮起来。
+   老师扫这张图，想看的就是「哪几关是磨出来的」。
+   The first-attempt column dims when it matches the best and lights up when it
+   does not: what a teacher scans this for is which levels were ground out. */
+.sheet td.same{color:rgba(255,255,255,.42);font-weight:400}
+.sheet td.diff{color:#ffd98a}
+.sheet tr.tot td.same{color:rgba(255,199,44,.5)}
+.sheet tr.tot td.diff{color:#ffd98a}
 .sheet tr.hd td.v{color:rgba(255,255,255,.4);font-weight:700}
 .sheet tr.tot td{border-top:1px solid rgba(255,199,44,.35);padding-top:4px;font-size:12.5px;
   color:var(--gold);font-weight:900}
@@ -756,7 +764,16 @@ const ls = {
 };
 const S = {
   name:'', cls:'', av:0, py:false, en:true, laps:[0,0,0], doneAt:'',
-  marks:[[],[],[]],     // marks[lv][panel] = 该版面得分 ｜ marks earned on that panel
+  marks:[[],[],[]],     // marks[lv][panel] = 该版面<b>最好</b>的一次 ｜ the BEST attempt
+  /* 另记第一次做那个版面的得分，写下去就不再改。
+     送进 SLS 的是最好的一次（这是「练到会为止」该有的样子），
+     但那个数字看不出谁是一次就会、谁是磨了三轮才过。
+     两个数字并排印在凭证上，老师一眼就分得出来。
+     The score from the FIRST time each panel was completed, never overwritten.
+     SLS receives the best attempt — right for a mastery gate — but that number
+     cannot tell apart a student who had it immediately from one who ground
+     through three retries. Printed side by side, the certificate can. */
+  first:[[],[],[]],
   lv:0, pi:0
 };
 
@@ -778,19 +795,42 @@ function load(){
       if(sharedPy == null && o.py != null) S.py = !!o.py;
       if(sharedLang == null && o.en != null) S.en = !!o.en;
       if(Array.isArray(o.marks) && o.marks.length === 3) S.marks = o.marks;
+      if(Array.isArray(o.first) && o.first.length === 3) S.first = o.first;
     }
   }catch(e){}
 }
 function save(){
   try{ localStorage.setItem(KEY, JSON.stringify(
     {name:S.name, cls:S.cls, av:S.av, py:S.py, en:S.en, laps:S.laps, doneAt:S.doneAt,
-     marks:S.marks, snd:SFX.on, bgm:BGM.on})); }catch(e){}
+     marks:S.marks, first:S.first, snd:SFX.on, bgm:BGM.on})); }catch(e){}
   ls.set(PY_KEY, S.py ? '1' : '0');
   ls.set(LANG_KEY, S.en ? 'both' : 'zh');
 }
 
 const lvScore = i => (S.marks[i]||[]).reduce((a,b)=>a+(b|0),0);
 const total   = () => LEVELS.reduce((a,_,i)=>a+lvScore(i),0);
+
+/* 第一次的成绩。有任何一个版面没记到就回传 null —— 与其印一个
+   偷偷少算了一关的数字，不如老实印一个破折号。
+   （这份纪录是後来才加的，旧存档没有，回传 null 正好显示「—」。）
+   The first-attempt total, or null if any panel is unrecorded: better an honest
+   dash than a number quietly missing a level. Saves made before this record
+   existed have none, and null is exactly what should print there. */
+function lvFirst(i){
+  const f = S.first[i] || [], n = LEVELS[i].panels.length;
+  let sum = 0;
+  for(let p = 0; p < n; p++){ if(f[p] == null) return null; sum += f[p]|0; }
+  return sum;
+}
+function firstTotal(){
+  let sum = 0;
+  for(let i = 0; i < LEVELS.length; i++){
+    const v = lvFirst(i);
+    if(v == null) return null;
+    sum += v;
+  }
+  return sum;
+}
 const lvDone  = i => (S.marks[i]||[]).filter(v=>v!=null).length === LEVELS[i].panels.length;
 /* 版面满分＝可放的卡片数；多选与选择题各 1 分
    A panel's max = the number of placeable cards; multi/choice are worth 1 */
@@ -1663,6 +1703,8 @@ function settle(){
   const prev = S.marks[S.lv][S.pi];
   /* 可以重做，取最好的一次 ｜ replayable; the best attempt stands */
   S.marks[S.lv][S.pi] = Math.max(prev == null ? -1 : prev, P.marks);
+  /* 第一次的成绩只写一次，重做不会覆盖 ｜ written once; a retry never overwrites it */
+  if(S.first[S.lv][S.pi] == null) S.first[S.lv][S.pi] = P.marks;
   if(!S.doneAt && LEVELS.every((_,i)=>lvDone(i))){
     const n = new Date();
     S.doneAt = n.getFullYear() + '-' + String(n.getMonth()+1).padStart(2,'0') + '-' +
@@ -1897,16 +1939,32 @@ function scrTopShow(){
         '<div class="who">' + esc(S.name) +
           (S.cls ? '<small>' + esc(S.cls) + '</small>' : '') + '</div>' +
         '<table>' +
-          '<tr class="hd"><td>关卡</td><td class="v">分数</td><td class="v">用时</td></tr>' +
-          LEVELS.map((L,i)=>
-            '<tr><td>' + esc(L.n) + '</td>' +
-            '<td class="v">' + lvScore(i) + '/' + lvMax(i) + '</td>' +
-            '<td class="v">' + CLOCK.fmt(CLOCK.lap(i)) + '</td></tr>').join('') +
-          '<tr class="tot"><td>总计 Total</td>' +
-            '<td class="v">' + total() + '/' + MAX + '</td>' +
-            '<td class="v">' + CLOCK.fmt(CLOCK.total()) + '</td></tr>' +
+          '<tr class="hd"><td>关卡</td><td class="v">首次</td><td class="v">最好</td>' +
+            '<td class="v">用时</td></tr>' +
+          LEVELS.map((L,i)=>{
+            const f = lvFirst(i);
+            /* 首次与最好一样，就淡一点 —— 一眼扫下去，只有<b>不</b>一样的那几行会跳出来
+               When the two match, dim the first column: scanning down, only the
+               rows that differ should catch the eye */
+            const same = f != null && f === lvScore(i);
+            return '<tr><td>' + esc(L.n) + '</td>' +
+              '<td class="v' + (same ? ' same' : ' diff') + '">' +
+                (f == null ? '—' : f + '/' + lvMax(i)) + '</td>' +
+              '<td class="v">' + lvScore(i) + '/' + lvMax(i) + '</td>' +
+              '<td class="v">' + CLOCK.fmt(CLOCK.lap(i)) + '</td></tr>';
+          }).join('') +
+          (function(){
+            const ft = firstTotal();
+            const same = ft != null && ft === total();
+            return '<tr class="tot"><td>总计 Total</td>' +
+              '<td class="v' + (same ? ' same' : ' diff') + '">' +
+                (ft == null ? '—' : ft + '/' + MAX) + '</td>' +
+              '<td class="v">' + total() + '/' + MAX + '</td>' +
+              '<td class="v">' + CLOCK.fmt(CLOCK.total()) + '</td></tr>';
+          })() +
         '</table>' +
         '<div class="meta">' +
+          '<div>首次＝第一次做那一关的得分　最好＝重做后取最好的一次</div>' +
           '<div>完成 ' + when + '</div>' +
           '<div>单元五《学无止境》· 对比论证法</div>' +
           '<div>验证码 ' + verifyCode(when) + '</div>' +
@@ -1932,6 +1990,7 @@ function scrTopShow(){
    goes unnoticed, since the code would stop matching. */
 function verifyCode(when){
   const raw = [S.name, S.cls, S.marks.map(m=>m.join(',')).join(';'),
+               S.first.map(m=>m.join(',')).join(';'),
                CLOCK.total(), when].join('|');
   let h = 2166136261;
   for(let i=0;i<raw.length;i++){ h ^= raw.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }

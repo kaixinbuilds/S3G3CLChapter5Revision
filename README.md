@@ -106,7 +106,13 @@ This component goes into the SLS Community Gallery, so it **always opens on a we
 
 **没有下载按钮** —— SLS 的 iframe sandbox 里下载不可靠，而且官方禁用外部函式库（html2canvas 用不了）。以装置原生截图为准；截图会把 SLS 页面一并拍进去，反而可以佐证学生确实是在登入状态下作答的。
 
-画面上有：姓名、班级、三关分数、**三关各自的用时与总用时**、完成日期与时间、验证码。
+画面上有：姓名、班级、三关的**首次**与**最好**成绩、三关各自的用时与总用时、完成日期与时间、验证码。
+
+**首次那一栏是给老师看的。**送进 SLS 的是重做后最好的一次 —— 这是「练到会为止」该有的样子，但那个数字看不出谁是一次就会、谁是磨了三轮才过。凭证上两个数字并排：一样的淡下去，不一样的亮起来，扫一眼就知道哪一关是磨出来的。
+
+例：`第二关　首次 3/12　最好 12/12` —— 这个学生第一次几乎全错，重做之后全对。SLS 只会看到 12。
+
+**The 首次 (first-attempt) column is for you.** SLS receives the best attempt after retries — correct for a mastery gate, but that number cannot tell apart a student who had it immediately from one who ground through three retries. The certificate prints both: matching rows dim, differing rows light up. `第二关 首次 3/12 最好 12/12` is a student who got almost none of it first time and all of it second. SLS sees only the 12.
 
 **No download button**: downloads are unreliable inside the SLS sandbox and external libraries are barred, so html2canvas is out. The device's own screenshot is the mechanism — and it catches the surrounding SLS page too, which is itself evidence the student was logged in. The screen carries the name, class, per-level marks, **per-level and total climb times**, the finish date and time, and a short verification code.
 
