@@ -13,7 +13,7 @@ Why the library is inlined: SLS runs uploaded content in a sandboxed iframe
 that blocks every outbound request — no CDN, no external <script src>. So the
 41KB library has to sit in the file as plain text.
 """
-import os, re, sys
+import os, re, sys, zipfile
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import bank
@@ -127,9 +127,23 @@ dst = os.path.join(ROOT, "sls", "index.html")
 os.makedirs(os.path.dirname(dst), exist_ok=True)
 open(dst, "w", encoding="utf-8").write(out)
 
+# 顺手把要上传的 zip 也打好，放在 repo 最上层 —— 老师打开资料夹一眼就看到。
+# 由脚本产生而不是手动压缩，是因为手动压的那一份迟早会跟 index.html 对不上：
+# 改了题目忘了重压，上传的就是旧版，而且没有任何迹象。
+# Also build the upload zip, at the top level of the repo where it is the first
+# thing visible in Finder. It is generated rather than zipped by hand because a
+# hand-made archive eventually falls behind index.html — edit the questions,
+# forget to re-zip, and the old version gets uploaded with nothing to show it.
+zip_path = os.path.join(ROOT, "unit5sls.zip")
+with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED, compresslevel=9) as z:
+    # 压缩档里必须只有一个 index.html，不能有资料夹层级 —— SLS 会找不到
+    # A single index.html with no folder nesting; SLS cannot find it otherwise
+    z.writestr("index.html", out)
+
 print(f"game.html      {len(src)/1024:7.1f} KB")
 print(f"+ xAPIWrapper  {len(lib)/1024:7.1f} KB")
 print(f"= sls/index.html {len(out)/1024:5.1f} KB")
+print(f"= unit5sls.zip   {os.path.getsize(zip_path)/1024:5.1f} KB  ← 上传这个 ｜ upload this one")
 levels, _, _ = bank.load()
 mx = bank.total_max(levels)
 print(f"\n题库：{len(levels)} 关 {sum(len(l['panels']) for l in levels)} 版面 {mx} 分")

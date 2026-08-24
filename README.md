@@ -102,7 +102,7 @@ The name never leaves the student's own device: it is not sent with the score an
 | **用在哪里**<br>**Where it runs** | 任何网站 / GitHub Pages<br>Any website / GitHub Pages | SLS Interactive Response |
 | **分数进不进教师后台**<br>**Scores in the gradebook** | ❌ 只在画面上<br>❌ On screen only | ✅ 自动送进 Learning Progress<br>✅ Posted automatically |
 | **内含 xAPI wrapper** | 否 ｜ No | 是，内嵌 xAPIWrapper v1.11.0 ｜ Yes, embedded inline |
-| **怎么部署 ｜ Deploy** | Settings → Pages | 压缩成 .zip 上传 ｜ Zip and upload |
+| **怎么部署 ｜ Deploy** | Settings → Pages | 上传 `unit5sls.zip` ｜ Upload `unit5sls.zip` |
 
 **内容一字不差**，差别只在于分数会不会送回 SLS。`sls/index.html` 由 `tools/build-sls.py` 从 `game.html` 生成 —— **不要手改**，改了 `game.html` 重跑脚本就好。
 
@@ -162,6 +162,7 @@ python3 tools/build-scene.py    # 网页那份山景 ｜ the website's copy of t
 ## 档案结构 ｜ Repo structure
 
 ```
+├── unit5sls.zip                ← 上传 SLS 就是这个（脚本产生）｜ the file you upload to SLS (generated)
 ├── index.html                  ← 落地页：两道门 ｜ Landing page: the two doors
 ├── game.html                   ← 游戏（网页版）｜ The game (web build)  ← 唯一的真本 ｜ the source of truth
 ├── sls/index.html              ← 游戏（SLS 版，自动记分，由脚本生成）｜ generated SLS build

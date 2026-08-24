@@ -5,9 +5,9 @@
 
 ## 一、先把档案准备好 ｜ Get the file ready
 
-要上传的是 **`sls/index.html`**，不是 `game.html`。
+要上传的是 repo 最上层的 **`unit5sls.zip`**（里面是 `sls/index.html`），不是 `game.html`。
 
-Upload **`sls/index.html`**, not `game.html`.
+Upload **`unit5sls.zip`** from the top level of the repo (it contains `sls/index.html`), not `game.html`.
 
 改过题目的话，先重跑一次，否则上传的还是旧版：
 If you have edited the questions, rebuild first or you will upload the old version:
@@ -16,13 +16,21 @@ If you have edited the questions, rebuild first or you will upload the old versi
 python3 tools/build-sls.py
 ```
 
-压缩：**只压 `index.html` 这一个档案**，压缩档里不要有资料夹层级。
+**不必自己压缩** —— `tools/build-sls.py` 已经把 `unit5sls.zip` 打好放在 repo 最上层，
+打开资料夹第一眼就看到。里面只有一个 `index.html`，没有资料夹层级（有的话 SLS 会找不到）。
 
-Zip it: **the single `index.html`**, with no folder nesting inside the archive.
+**You do not need to zip anything.** `tools/build-sls.py` writes `unit5sls.zip`
+at the top level of the repo — the first thing you see when you open the folder.
+It holds a single `index.html` with no folder nesting, which is what SLS needs.
 
 ```bash
-cd sls && zip unit5.zip index.html
+python3 tools/build-sls.py     # 重建 index.html 与 unit5sls.zip ｜ rebuilds both
 ```
+
+> zip 由脚本产生，不是手动压的。手压的那一份迟早会跟 `index.html` 对不上 ——
+> 改了题目忘了重压，上传的就是旧版，而且没有任何迹象。
+> The archive is generated, not hand-made: a hand-made one eventually falls
+> behind `index.html`, and an old version uploads with nothing to show for it.
 
 > 档案大约 250KB，其中约 180KB 是四个角色的贴图、41KB 是 xAPIWrapper。全部内嵌是必须的 —— 见下面「为什么不能有外部档案」。
 > The file is ~250KB: ~180KB of character sprites and 41KB of xAPIWrapper, all inlined by necessity — see below.
@@ -31,7 +39,7 @@ cd sls && zip unit5.zip index.html
 
 1. 课业里 **Add Section → Interactive Response**
    —— **一定要选 Interactive Response**。选 Text/Media 的话，游戏照样能玩，但**分数永远是空的**，这是最常见的失败原因。
-2. 上传 `unit5.zip`
+2. 上传 `unit5sls.zip`
 3. **Maximum Marks 设成 36**
    —— 就是游戏开场画面显示的满分。留在预设的 0，分数送出了老师也看不到。
    —— 日后删题加题，满分会自己变，记得回来把这个数字改成开场画面上的新数。
