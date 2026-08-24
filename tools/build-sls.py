@@ -135,10 +135,21 @@ open(dst, "w", encoding="utf-8").write(out)
 # hand-made archive eventually falls behind index.html — edit the questions,
 # forget to re-zip, and the old version gets uploaded with nothing to show it.
 zip_path = os.path.join(ROOT, "unit5sls.zip")
-with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED, compresslevel=9) as z:
+# 时间戳写死。zip 预设会把「压缩当下的时间」存进去，于是内容一个字没改、
+# 重跑一次脚本，档案的位元组也会不一样 —— git 每次都说 unit5sls.zip 改过了。
+# 久了就没人看那行提示，真的改了也一样被忽略。写死之后，git 说变了就是真的变了。
+# Pin the timestamp. By default a zip records the moment it was created, so
+# re-running the script with byte-identical content still produces a different
+# file and git reports unit5sls.zip as modified every single time. That noise
+# trains you to ignore the line, including when it matters. Pinned, a reported
+# change is a real change.
+info = zipfile.ZipInfo("index.html", date_time=(2026, 1, 1, 0, 0, 0))
+info.compress_type = zipfile.ZIP_DEFLATED
+info.external_attr = 0o644 << 16
+with zipfile.ZipFile(zip_path, "w") as z:
     # 压缩档里必须只有一个 index.html，不能有资料夹层级 —— SLS 会找不到
     # A single index.html with no folder nesting; SLS cannot find it otherwise
-    z.writestr("index.html", out)
+    z.writestr(info, out, compresslevel=9)
 
 print(f"game.html      {len(src)/1024:7.1f} KB")
 print(f"+ xAPIWrapper  {len(lib)/1024:7.1f} KB")
