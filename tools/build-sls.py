@@ -15,6 +15,9 @@ that blocks every outbound request — no CDN, no external <script src>. So the
 """
 import os, re, sys
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import bank
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 src  = open(os.path.join(ROOT, "game.html"), encoding="utf-8").read()
 lib  = open(os.path.join(ROOT, "tools", "xapiwrapper-1.11.0.min.js"), encoding="utf-8").read()
@@ -105,4 +108,7 @@ open(dst, "w", encoding="utf-8").write(out)
 print(f"game.html      {len(src)/1024:7.1f} KB")
 print(f"+ xAPIWrapper  {len(lib)/1024:7.1f} KB")
 print(f"= sls/index.html {len(out)/1024:5.1f} KB")
-print("\n上传 SLS 时记得把 Maximum Marks 设成 40 ｜ set Maximum Marks to 40 on upload")
+levels, _, _ = bank.load()
+mx = bank.total_max(levels)
+print(f"\n题库：{len(levels)} 关 {sum(len(l['panels']) for l in levels)} 版面 {mx} 分")
+print(f"上传 SLS 时把 Maximum Marks 设成 {mx} ｜ set Maximum Marks to {mx} on upload")

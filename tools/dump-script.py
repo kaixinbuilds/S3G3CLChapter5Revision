@@ -13,83 +13,16 @@ the game, re-run this.
 
 用法 ｜ Usage:  python3 tools/dump-script.py
 """
-import os, re, json, sys
+import os, sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import bank
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SRC  = open(os.path.join(ROOT, "game.html"), encoding="utf-8").read()
+LEVELS, RUBY, AV_NAMES = bank.load()
 
-
-def grab(name, open_ch, close_ch):
-    """抓出 `const NAME = [...]` 的整段字面量 ｜ pull out the whole literal"""
-    i = SRC.index("const " + name + " = ")
-    i = SRC.index(open_ch, i)
-    depth, j, in_str = 0, i, False
-    while j < len(SRC):
-        c = SRC[j]
-        if in_str:
-            if c == "\\": j += 2; continue
-            if c == "'": in_str = False
-        elif c == "'": in_str = True
-        elif c == "/" and SRC[j+1:j+2] == "*":
-            j = SRC.index("*/", j) + 2; continue
-        elif c == open_ch: depth += 1
-        elif c == close_ch:
-            depth -= 1
-            if depth == 0: return SRC[i:j+1]
-        j += 1
-    sys.exit("unterminated literal: " + name)
-
-
-def js_to_json(src):
-    """JS 字面量 → JSON：去注释、单引号转双引号、键名补引号、去掉多余逗号
-       JS literal -> JSON: strip comments, requote strings and keys, drop trailing commas"""
-    out, i, n = [], 0, len(src)
-    while i < n:
-        c = src[i]
-        if c == "'":                                   # 单引号字串 ｜ single-quoted string
-            j, buf = i + 1, []
-            while j < n and src[j] != "'":
-                if src[j] == "\\":
-                    buf.append(src[j+1]); j += 2
-                else:
-                    buf.append(src[j]); j += 1
-            out.append(json.dumps("".join(buf), ensure_ascii=False))
-            i = j + 1
-        elif c == "/" and src[i+1:i+2] == "*":
-            i = src.index("*/", i) + 2
-        elif c == "/" and src[i+1:i+2] == "/":
-            i = src.index("\n", i)
-        elif c.isalpha() or c == "_":                  # 可能是键名 ｜ possibly a key
-            j = i
-            while j < n and (src[j].isalnum() or src[j] in "_$"): j += 1
-            word = src[i:j]
-            k = j
-            while k < n and src[k] in " \t\n": k += 1
-            if k < n and src[k] == ":":
-                out.append(json.dumps(word)); i = j
-            else:
-                out.append("null" if word in ("undefined",) else word); i = j
-        else:
-            out.append(c); i += 1
-    txt = "".join(out)
-    txt = re.sub(r",(\s*[\]}])", r"\1", txt)           # 尾逗号 ｜ trailing commas
-    return txt
-
-
-people = grab("PEOPLE", "[", "]")
-levels = grab("LEVELS", "[", "]").replace("slots:PEOPLE", "slots:" + people)
-ruby   = grab("RUBY", "{", "}")
-avn    = grab("AV_NAMES", "[", "]")
-
-LEVELS   = json.loads(js_to_json(levels))
-RUBY     = json.loads(js_to_json(ruby))
-AV_NAMES = json.loads(js_to_json(avn))
-
-def pmax(d):
-    return len([c for c in d["cards"] if c["s"] >= 0]) if d.get("k") == "slots" else 1
-def lmax(lv):
-    return sum(pmax(d) for d in lv["panels"])
-TOTAL = sum(lmax(l) for l in LEVELS)
+pmax, lmax = bank.panel_max, bank.level_max
+TOTAL = bank.total_max(LEVELS)
 
 B = lambda t: str(t).replace("<b>", "**").replace("</b>", "**")
 L = []
