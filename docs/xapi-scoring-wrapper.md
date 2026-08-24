@@ -91,10 +91,10 @@ document.addEventListener('DOMContentLoaded', () => XAPIUtils.init());
 
 ```javascript
 // 1. Optional checkpoint — e.g. after level 1 finishes
-XAPI.sendScore(total(), 40);   // (累计总分, 满分) ｜ (running total, max)
+XAPI.sendScore(total(), MAX);  // (累计总分, 满分) ｜ (running total, max)
 
 // 2. Required — when the whole game/activity is completed
-XAPI.sendScore(total(), 40);
+XAPI.sendScore(total(), MAX);
 ```
 
 `total()` 是本游戏算三关累计总分的函式，换成你自己程式里的名称即可。
@@ -106,7 +106,7 @@ XAPI.sendScore(total(), 40);
 | 状况 ｜ Issue | 怎么办 ｜ Fix |
 |---|---|
 | 后台分数是空的<br>Score shows blank in the gradebook | 元件**必须**用 **Interactive Response** 上传，不能用 Text/Media（见 [sls-deployment.md](sls-deployment.md)）<br>The component **must** be uploaded as **Interactive Response**, not Text/Media |
-| 分数卡在 99 上不去<br>Score caps at 99 | SLS 对 Interactive Response 的 **Maximum Marks** 硬性上限就是 99 —— 请重新设计配分（本游戏是每张卡片 1 分 × 40 = 40 分），而不是每题 10 分<br>That's SLS's hard limit — recalibrate your scoring (this game: 1 mark per card x 40 = 40) rather than 10 marks per question |
+| 分数卡在 99 上不去<br>Score caps at 99 | SLS 对 Interactive Response 的 **Maximum Marks** 硬性上限就是 99 —— 请重新设计配分（本游戏是每张卡片 1 分，满分 36），而不是每题 10 分<br>That's SLS's hard limit — recalibrate your scoring (this game: 1 mark per card, 36 in total) rather than 10 marks per question |
 | 什么都没发生，也没有错误讯息<br>Nothing happens, no console errors | 确认你是在 SLS *里面*测试。在本机浏览器打开时，网址里没有 `endpoint` 参数，`init()` 会安静跳过 —— 这是正常行为，不是坏了<br>Check you're testing *inside* SLS; opened locally there's no `endpoint` parameter, so `init()` silently skips — expected, not a bug |
 | 分数送出了，老师却看不到<br>Score submitted but the teacher can't see it | 确认 SLS 元件里的 **Maximum Marks** 真的设了（不是留在预设的 0）<br>Confirm **Maximum Marks** was actually set on the component, not left at 0 |
 
@@ -143,7 +143,7 @@ That's the entire integration. Everything else in this repo — the platformer m
 
 ```javascript
 // 对：每次都送累计总分 ｜ right: always the running total
-XAPI.sendScore(total(), 40);
+XAPI.sendScore(total(), MAX);
 
 // 错：送单关分数，日后补做会把之前的洗掉
 // wrong: sending one level's score wipes the earlier ones

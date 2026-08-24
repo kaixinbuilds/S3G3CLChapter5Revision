@@ -353,7 +353,7 @@ body.py rt{visibility:visible}
     <span class="prog" id="prog"></span>
     <span class="sp"></span>
     <span id="clock">⏱ 00:00</span>
-    <span id="score">0 / 40</span>
+    <span id="score">0 / 0</span>
     <button class="tbtn" id="enBtn" type="button" aria-pressed="true">EN</button>
     <button class="tbtn" id="pyBtn" type="button" aria-pressed="false">拼音 Pinyin</button>
     <button class="ibtn" id="sndBtn" type="button" title="音效 Sound">🔊</button>
@@ -453,9 +453,14 @@ function zh(s){
 /* ══════════════════════════════════════════════════════════════
    二、题库 ｜ 2. THE QUESTION BANK
    来源：单元五 HTML 游戏题库（2026-08-24 审阅稿）
-   总分 40＝第一关 10 ＋ 第二关 15 ＋ 第三关 15，每张卡片 1 分。
+   每张可放的卡片 1 分，选择题 1 分。<b>满分不写死</b>，由题库算出来 ——
+   删一个版面就少几分，画面、送进 SLS 的分数、评语门槛全部自动跟着改。
+   （所以上传 SLS 时的 Maximum Marks 要照开场画面显示的满分设。）
    Source: the Unit 5 reviewed question bank (2026-08-24).
-   40 marks = 10 + 15 + 15, one mark per placeable card.
+   One mark per placeable card, one per choice question. The maximum is NOT
+   hard-coded: it is computed from the bank, so removing a panel updates the
+   display, the score sent to SLS and the feedback thresholds together. (Set the
+   SLS component's Maximum Marks to whatever the opening screen shows.)
 
    版面型别 ｜ Panel kinds
      slots  —— 把卡片拖进格子；卡片的 s 是正确格子的编号，s:-1 是干扰项
@@ -475,7 +480,7 @@ const PEOPLE = [
 
 const LEVELS = [
 {
-  n:'第一关', t:'生活空间《你在学什么》', max:10, cols:5,
+  n:'第一关', t:'生活空间《你在学什么》', cols:5,
   panels:[
     { k:'slots', cols:5, hd:'学习的内容',
       tip:{zh:'五位受访者在学什么？把答案拖到对的格子里。',
@@ -512,7 +517,7 @@ const LEVELS = [
   ]
 },
 {
-  n:'第二关', t:'核心《学然后知不足》', max:15,
+  n:'第二关', t:'核心《学然后知不足》',
   panels:[
     { k:'slots', cols:2, hd:'正反例子与论点',
       tip:{zh:'例子在前，论点在后。哪一个是<b>反面</b>例子，哪一个是<b>正面</b>例子？',
@@ -525,21 +530,6 @@ const LEVELS = [
         {t:'越是深入学习，越能感到自己掌握的知识有限', s:1}
       ],
       e:'《学然后知不足》是<b>先反后正</b>：第2段用楚国人从反面证明，第3段用芝诺从正面证明。'
-    },
-    { k:'slots', cols:3, hd:'引用语句配意思',
-      tip:{zh:'三句引语各是什么意思？把意思拖到引语下面。',
-           en:'Match each quotation to what it means.'},
-      slots:[
-        {t:'「从这个意义上讲，我不知道的东西比你们更多。」',sub:'芝诺'},
-        {t:'「不满足是向上的车轮。」',sub:'鲁迅'},
-        {t:'「问渠哪得清如许，为有源头活水来。」',sub:'朱熹'}
-      ], cap:1,
-      cards:[
-        {t:'知识越多，接触到的未知领域也越多，越能发觉自己的不足。',   s:0},
-        {t:'永不满足能推动人不断进取。',                               s:1},
-        {t:'持续不断的学习就像永不枯竭的源头，能不断增进知识。',       s:2}
-      ],
-      e:'作者引用名人的话来证明自己的论点，这叫<b>引用论证法</b>。'
     },
     { k:'slots', cols:2, hd:'反问句判断',
       tip:{zh:'反问句<b>答案就藏在问句里</b>，不需要回答。哪几句是？',
@@ -568,26 +558,23 @@ const LEVELS = [
       ],
       e:'本论三段：一反、一正、再引用。三段各司其职，合起来才撑得住结论。'
     },
-    { k:'multi', hd:'第1段的修辞手法',
+    { k:'choice', hd:'第1段的修辞手法',
       tip:{zh:'第1段连举雄鹰、小河、青蛙三个例子。',
-           en:'Paragraph 1 lines up three images in a row. Pick every one that applies.'},
-      q:'以下哪些修辞手法在第1段出现？（多选，全选对才得分）',
-      opts:[
-        {t:'排比', ok:true},
-        {t:'比喻', ok:true},
-        {t:'拟人', ok:false},
-        {t:'夸张', ok:false}
-      ],
-      /* ［存疑］旁批只问「什么修辞手法」，课本未给答案。改成多选后
-         不必在排比／比喻之间二选一，也更贴近课文实况。
-         FLAGGED: the textbook margin note asks the question but gives no answer.
-         Multi-select avoids having to pick one of two defensible answers. */
-      e:'三个例子句式相同、连着排开，是<b>排比</b>；每一个又拿别的事物来说明学习，是<b>比喻</b>。两者兼用。'
+           en:'Paragraph 1 lines up three images in a row.'},
+      q:'第1段连举雄鹰、小河、青蛙三例，用的是什么修辞手法？',
+      opts:['排比', '比喻', '拟人', '夸张'],
+      a:0,
+      /* 「比喻」留作干扰项：它是最像的那个错答案，选它的学生看到的是
+         单个句子里的比方，没看到三句<b>连着排开</b>这件事。
+         比喻 is kept as the distractor because it is the closest wrong answer:
+         a student who picks it is seeing the individual images and missing the
+         thing that matters here — that three parallel clauses run in a row. */
+      e:'三个例子句式相同、连着排开，这是<b>排比</b>。'
     }
   ]
 },
 {
-  n:'第三关', t:'巩固《终身学习》', max:15,
+  n:'第三关', t:'巩固《终身学习》',
   panels:[
     { k:'slots', cols:2, hd:'正反例子与论点',
       tip:{zh:'和第二关一样的做法 —— 但请留意，<b>正反的位置换了</b>。',
@@ -644,17 +631,6 @@ const LEVELS = [
       ],
       e:'第4段与第5段谈的是同一件事 —— 终身学习并不难，而且有具体做法 —— 所以合成一张卡。'
     },
-    { k:'choice', hd:'俗语的意思',
-      tip:{zh:'最后一题。',en:'Last one.'},
-      q:'「学如逆水行舟，不进则退」是什么意思？',
-      opts:[
-        '学习就像逆着水流行船，不前进就会后退，所以不能满足于已有的成果',
-        '学习就像顺水行船，只要方向对了，不必费力也能一直前进',
-        '学习就像行船，遇到逆流就该停下来等待，不必勉强前进'
-      ],
-      a:0,
-      e:'这句话和第二关朱熹的「问渠哪得清如许」一样，都拿<b>水</b>来比喻学习 —— 一个说不进则退，一个说源头要活。'
-    }
   ]
 }];
 
@@ -733,6 +709,11 @@ const lvDone  = i => (S.marks[i]||[]).filter(v=>v!=null).length === LEVELS[i].pa
 /* 版面满分＝可放的卡片数；多选与选择题各 1 分
    A panel's max = the number of placeable cards; multi/choice are worth 1 */
 const panelMax = p => p.k==='slots' ? p.cards.filter(c=>c.s>=0).length : 1;
+/* 每关满分与全场满分都是算出来的，题库是唯一的真本
+   Both a level's maximum and the grand total are computed; the bank is the
+   single source of truth */
+const lvMax = i => LEVELS[i].panels.reduce((a,p)=>a+panelMax(p), 0);
+const MAX   = LEVELS.reduce((a,_,i)=>a+lvMax(i), 0);
 
 /* ══════════════════════════════════════════════════════════════
    五、山景 ｜ 5. THE MOUNTAIN
@@ -1289,7 +1270,7 @@ function renderPanel(){
   lvNameEl.textContent = L.n;
   progEl.innerHTML = '版面 ' + (S.pi+1) + '/' + L.panels.length +
                      ' · <b>' + esc(d.hd) + '</b>';
-  scoreEl.textContent = total() + ' / 40';
+  scoreEl.textContent = total() + ' / ' + MAX;
   tipEl.innerHTML = zh(d.tip.zh) + '<span class="en">' + esc(d.tip.en) + '</span>';
   poolEl.innerHTML = ''; slotsEl.innerHTML = '';
   poolEl.className = ''; slotsEl.style.gridTemplateColumns = '';
@@ -1539,8 +1520,8 @@ function settle(){
                String(n.getHours()).padStart(2,'0') + ':' + String(n.getMinutes()).padStart(2,'0');
   }
   save();
-  scoreEl.textContent = total() + ' / 40';
-  XAPI.sendScore(total(), 40);            // 每次都送累计总分 ｜ always the running total
+  scoreEl.textContent = total() + ' / ' + MAX;
+  XAPI.sendScore(total(), MAX);            // 每次都送累计总分 ｜ always the running total
   climbTo(donePanels() / allPanels());
 
   say('<b>' + P.marks + '/' + P.max + '</b> · ' + zh(P.d.e),
@@ -1565,8 +1546,8 @@ goBtn.addEventListener('click', ()=>{ if(goAction) goAction(); });
 function scrNameShow(){
   paintScr('scrName',
     '<h1>⛰️ 书山登顶</h1>' +
-    '<p>单元五《学无止境》· 三关共 40 分' +
-      '<span class="en">Unit 5 · three levels · 40 marks</span></p>' +
+    '<p>单元五《学无止境》· 三关共 ' + MAX + ' 分' +
+      '<span class="en">Unit 5 · three levels · ' + MAX + ' marks</span></p>' +
     '<div class="row">' +
       '<span class="field"><label>姓名 Name</label>' +
         '<input id="inName" maxlength="12" autocomplete="off" value="'+esc(S.name)+'"></span>' +
@@ -1627,13 +1608,13 @@ function scrMenuShow(){
         '<span class="n">' + esc(L.n) + '</span>' +
         '<span class="t">' + esc(L.t) + '</span>' +
         '<span class="s">' + (lvDone(i)
-            ? '✅ <b>' + lvScore(i) + '</b> / ' + L.max + ' 分'
+            ? '✅ <b>' + lvScore(i) + '</b> / ' + lvMax(i) + ' 分'
             : (donePanels() && (S.marks[i]||[]).some(v=>v!=null)
                 ? '继续 · ' + (S.marks[i]||[]).filter(v=>v!=null).length + '/' + L.panels.length + ' 版面'
-                : '未开始 · ' + L.max + ' 分')) +
+                : '未开始 · ' + lvMax(i) + ' 分')) +
         '</span></button>').join('') +
     '</div>' +
-    '<p>目前总分 <b style="color:var(--gold)">' + total() + ' / 40</b>' +
+    '<p>目前总分 <b style="color:var(--gold)">' + total() + ' / ' + MAX + '</b>' +
       '　已用时 <b style="color:#fff">' + CLOCK.fmt(CLOCK.total()) + '</b></p>' +
     '<div class="row">' +
       '<button class="btn ghost" id="mAv" type="button">换角色 Character</button>' +
@@ -1653,16 +1634,16 @@ function scrMenuShow(){
 }
 
 function doneLevel(){
-  const L = LEVELS[S.lv], sc = lvScore(S.lv);
+  const L = LEVELS[S.lv], sc = lvScore(S.lv), mx = lvMax(S.lv);
   SFX.level();
-  const band = sc === L.max ? '全对 —— 这一关的每一张卡片你都是一次就放对的。'
-             : sc >= L.max*0.7 ? '不错。放错的那几张，回头再看一次课文就清楚了。'
+  const band = sc === mx ? '全对 —— 这一关的每一张卡片你都是一次就放对的。'
+             : sc >= mx*0.7 ? '不错。放错的那几张，回头再看一次课文就清楚了。'
              : '这一关可以再做一次 —— 分数会取最好的一次。';
   paintScr('scrDone',
     '<h1>' + esc(L.n) + ' 完成</h1>' +
     '<h2>' + esc(L.t) + '</h2>' +
-    '<p style="font-size:15px;color:#fff">得分 <b style="color:var(--gold)">' + sc + ' / ' + L.max + '</b>' +
-      '　总分 <b style="color:var(--green)">' + total() + ' / 40</b></p>' +
+    '<p style="font-size:15px;color:#fff">得分 <b style="color:var(--gold)">' + sc + ' / ' + mx + '</b>' +
+      '　总分 <b style="color:var(--green)">' + total() + ' / ' + MAX + '</b></p>' +
     '<p>' + zh(band) + '</p>' +
     '<div class="row">' +
       '<button class="btn ghost" id="dAgain" type="button">再做一次 Retry</button>' +
@@ -1702,10 +1683,10 @@ function scrTopShow(){
           '<tr class="hd"><td>关卡</td><td class="v">分数</td><td class="v">用时</td></tr>' +
           LEVELS.map((L,i)=>
             '<tr><td>' + esc(L.n) + '</td>' +
-            '<td class="v">' + lvScore(i) + '/' + L.max + '</td>' +
+            '<td class="v">' + lvScore(i) + '/' + lvMax(i) + '</td>' +
             '<td class="v">' + CLOCK.fmt(CLOCK.lap(i)) + '</td></tr>').join('') +
           '<tr class="tot"><td>总计 Total</td>' +
-            '<td class="v">' + total() + '/40</td>' +
+            '<td class="v">' + total() + '/' + MAX + '</td>' +
             '<td class="v">' + CLOCK.fmt(CLOCK.total()) + '</td></tr>' +
         '</table>' +
         '<div class="meta">' +
@@ -1790,6 +1771,7 @@ function scrWarnShow(then){
 function boot(){
   load();
   paintBand();
+  scoreEl.textContent = total() + ' / ' + MAX;
   setPy(S.py);
   setEn(S.en);
   $('sndBtn').textContent = SFX.on ? '🔊' : '🔇';

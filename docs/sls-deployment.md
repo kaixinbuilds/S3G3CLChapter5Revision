@@ -32,24 +32,25 @@ cd sls && zip unit5.zip index.html
 1. 课业里 **Add Section → Interactive Response**
    —— **一定要选 Interactive Response**。选 Text/Media 的话，游戏照样能玩，但**分数永远是空的**，这是最常见的失败原因。
 2. 上传 `unit5.zip`
-3. **Maximum Marks 设成 40**
-   —— 留在预设的 0，分数送出了老师也看不到。
+3. **Maximum Marks 设成 36**
+   —— 就是游戏开场画面显示的满分。留在预设的 0，分数送出了老师也看不到。
+   —— 日后删题加题，满分会自己变，记得回来把这个数字改成开场画面上的新数。
 4. 存档，用学生视角试做一遍
 
 <br>
 
 1. In your lesson: **Add Section → Interactive Response**. It **must** be Interactive Response — with Text/Media the game still plays but the score is always blank, which is the single most common failure.
 2. Upload `unit5.zip`
-3. Set **Maximum Marks to 40** — left at the default 0, the score is sent but never shown.
+3. Set **Maximum Marks to 36** — the number shown on the game's opening screen. Left at 0, the score is sent but never shown.
 4. Save, then try it as a student.
 
 ## 三、确认分数真的进去了 ｜ Confirm the score actually lands
 
 用学生账号做完一关，然后看 **Learning Progress**。
 
-分数是**累计总分**：做完第一关送 10，第一二关都做完送 25，全部做完送 40。中间隔几天再回来补做，分数会继续往上叠，不会把之前的洗掉 —— 这一点是刻意处理过的，见 [xapi-scoring-wrapper.md](xapi-scoring-wrapper.md)。
+分数是**累计总分**：做完第一关送 10，第一二关都做完送 22，全部做完送 36。中间隔几天再回来补做，分数会继续往上叠，不会把之前的洗掉 —— 这一点是刻意处理过的，见 [xapi-scoring-wrapper.md](xapi-scoring-wrapper.md)。
 
-The score is the **running total**: 10 after level 1, 25 after two, 40 after all three. Coming back days later to finish adds to it rather than replacing it — see [xapi-scoring-wrapper.md](xapi-scoring-wrapper.md) for why that took deliberate handling.
+The score is the **running total**: 10 after level 1, 22 after two, 36 after all three. Coming back days later to finish adds to it rather than replacing it — see [xapi-scoring-wrapper.md](xapi-scoring-wrapper.md) for why that took deliberate handling.
 
 ## 四、常见状况 ｜ When something is off
 
@@ -58,7 +59,7 @@ The score is the **running total**: 10 after level 1, 25 after two, 40 after all
 | 后台分数一片空白<br>Gradebook column is blank | 组件不是 Interactive Response，或 Maximum Marks 还是 0<br>Wrong component type, or Maximum Marks still 0 |
 | 学生说「我做完了但没分」<br>"I finished but got nothing" | 学生另开了分页。游戏会先弹双语警告拦一次，但学生可以按「仍要继续」——请他在 SLS 里重做一遍<br>They opened it in a new tab. The game warns first, but they can continue anyway; have them redo it inside SLS |
 | 画面一片空白<br>Blank screen | 压缩档里多了一层资料夹，SLS 找不到 index.html<br>The zip has a nested folder, so SLS can't find index.html |
-| 分数卡在 99<br>Score caps at 99 | SLS 的硬性上限。本游戏满分 40，不会碰到<br>An SLS hard limit; at 40 marks this game never hits it |
+| 分数卡在 99<br>Score caps at 99 | SLS 的硬性上限。本游戏满分 36，不会碰到<br>An SLS hard limit; at 36 marks this game never hits it |
 | 图片不显示 / 没有声音<br>No sprites, no sound | 档案被改动过，或不是用 build-sls.py 生成的<br>The file was hand-edited, or not produced by build-sls.py |
 
 ## 五、为什么不能有外部档案 ｜ Why nothing external is allowed

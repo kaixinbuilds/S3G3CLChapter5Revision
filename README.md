@@ -10,15 +10,15 @@
 
 ## 这是什么 ｜ What this is
 
-一款拖曳式的华文游戏，帮中三 G3（普通程度）学生看懂两篇课文都在用**对比论证法**。三关十二个版面，共 40 分，做完自动把分数送进 SLS 教师后台。由一位华文老师主要透过与 Claude（Anthropic）对话完成，**不需要任何编程基础**。
+一款拖曳式的华文游戏，帮中三 G3（普通程度）学生看懂两篇课文都在用**对比论证法**。三关十个版面，共 36 分，做完自动把分数送进 SLS 教师后台。由一位华文老师主要透过与 Claude（Anthropic）对话完成，**不需要任何编程基础**。
 
-A drag-and-drop Chinese Language game that gets Secondary 3 (G3 / lower-readiness) students to see that both texts in this unit run on **对比论证法** (argument by contrast). Three levels, twelve panels, 40 marks, and the score posts itself into the SLS gradebook. Built by a Chinese Language teacher, mostly in conversation with Claude (Anthropic), with **no prior coding background**.
+A drag-and-drop Chinese Language game that gets Secondary 3 (G3 / lower-readiness) students to see that both texts in this unit run on **对比论证法** (argument by contrast). Three levels, ten panels, 36 marks, and the score posts itself into the SLS gradebook. Built by a Chinese Language teacher, mostly in conversation with Claude (Anthropic), with **no prior coding background**.
 
 | | |
 |---|---|
 | **课文 ｜ Texts** | 生活空间《你在学什么》· 核心《学然后知不足》· 巩固《终身学习》 |
-| **总分 ｜ Marks** | 40（第一关 10 · 第二关 15 · 第三关 15）|
-| **版面 ｜ Panels** | 12 |
+| **总分 ｜ Marks** | 36（第一关 10 · 第二关 12 · 第三关 14）|
+| **版面 ｜ Panels** | 10 |
 | **用在哪里 ｜ Where** | SLS Interactive Response（单一组件，跨三节课）｜ one SLS component across three lessons |
 
 ---
@@ -28,8 +28,8 @@ A drag-and-drop Chinese Language game that gets Secondary 3 (G3 / lower-readines
 | 关 ｜ Level | 课文 ｜ Text | 学习点 ｜ The learning point |
 |---|---|---|
 | 第一关（10 分）| 生活空间《你在学什么》 | 五位受访者，从 6 岁到 76 岁 —— 学的内容各不相同，**看法**却要读得更细 |
-| 第二关（15 分）| 核心《学然后知不足》 | **先反后正**：楚国人（反）→ 芝诺（正）→ 引用论证；另有反问句判断与篇章结构 |
-| 第三关（15 分）| 巩固《终身学习》 | **先正后反**：李光耀（正）→ 方仲永（反）—— 正反位置对调，这个对调本身就是学习点 |
+| 第二关（12 分）| 核心《学然后知不足》 | **先反后正**：楚国人（反）→ 芝诺（正）；另有反问句判断、篇章结构与第1段的修辞手法 |
+| 第三关（14 分）| 巩固《终身学习》 | **先正后反**：李光耀（正）→ 方仲永（反）—— 正反位置对调，这个对调本身就是学习点 |
 
 收关时才点破：两篇课文一个先反后正、一个先正后反，做的是同一件事 —— **对比**。
 
@@ -100,16 +100,16 @@ The name never leaves the student's own device: it is not sent with the score an
 
 The content is identical; only the score reporting differs. `sls/index.html` is generated from `game.html` by `tools/build-sls.py` — **never edit it by hand**; edit the game and re-run the script.
 
-> 上传 SLS 时，**Maximum Marks 要设成 40**。SLS 对 Interactive Response 的上限是 99，40 分安全。
-> Set **Maximum Marks to 40** when uploading. SLS caps Interactive Response at 99, so 40 is safe.
+> 上传 SLS 时，**Maximum Marks 要设成 36**（就是开场画面显示的满分）。SLS 对 Interactive Response 的上限是 99，不会碰到。
+> Set **Maximum Marks to 36** when uploading — the number the opening screen shows. SLS caps Interactive Response at 99, so this never hits it.
 
 ---
 
 ## 改成自己的课文 ｜ Adapt it to your own text
 
-先看这一份：📄 **[全文校对稿](docs/全文校对稿.md)** —— 12 个版面的指示、卡片、答案、干扰项、答后讲解，加上 70 条拼音，全在一页里。这份文件由 `tools/dump-script.py` 从 `game.html` **自动生成**，不是另抄一份，所以永远等于学生看到的东西。
+先看这一份：📄 **[全文校对稿](docs/全文校对稿.md)** —— 10 个版面的指示、卡片、答案、干扰项、答后讲解，加上 70 条拼音，全在一页里。这份文件由 `tools/dump-script.py` 从 `game.html` **自动生成**，不是另抄一份，所以永远等于学生看到的东西。
 
-Start here: 📄 **[the full text dump](docs/全文校对稿.md)** — every instruction, card, answer, distractor and explanation across the 12 panels, plus all 70 pinyin entries. It is **generated** from `game.html` by `tools/dump-script.py` rather than maintained separately, so it always equals what students actually see.
+Start here: 📄 **[the full text dump](docs/全文校对稿.md)** — every instruction, card, answer, distractor and explanation across the 10 panels, plus all 70 pinyin entries. It is **generated** from `game.html` by `tools/dump-script.py` rather than maintained separately, so it always equals what students actually see.
 
 三条路径 ｜ Three paths: [原样拿去用](tasks/1-use-as-is.html) · [换角色美术](tasks/2-change-art.html) · [换成自己的课文](tasks/3-change-questions.html)
 
@@ -136,9 +136,9 @@ All in the **`LEVELS` array** in `game.html`, under the comment `二、题库 �
 { k:'choice', hd:'…', tip:{…}, q:'题目', opts:['甲','乙','丙'], a:0, e:'…' }
 ```
 
-每张可放的卡片值 1 分，多选与选择题各 1 分 —— 所以**改了题数就要重算总分**：`sendScore(total(), 40)` 与 SLS 的 Maximum Marks 都要跟着改。
+每张可放的卡片值 1 分，选择题 1 分。**满分不写死** —— `MAX` 由题库算出来，删一个版面，画面、送进 SLS 的分数、评语门槛会自动跟着改。你只要记得把 **SLS 的 Maximum Marks 改成开场画面显示的那个数**。
 
-Each placeable card is worth 1 mark; multi and choice are worth 1 each. **Change the number of items and you must recalculate the total** in `sendScore(total(), 40)` and in the SLS component's Maximum Marks.
+Each placeable card is worth 1 mark, as is each choice question. **The maximum is not hard-coded**: `MAX` is computed from the bank, so removing a panel updates the display, the score sent to SLS and the feedback thresholds together. The one thing you must still do by hand is set the **SLS Maximum Marks** to the number the opening screen shows.
 
 ### 改完记得重跑 ｜ Re-run after editing
 
@@ -176,16 +176,19 @@ python3 tools/build-scene.py    # 网页那份山景 ｜ the website's copy of t
 
 ---
 
-## 仍待复核 ｜ Still to be checked
+## 审阅后的决定 ｜ Decisions taken at review
 
-以下几题在题库审阅时标了［存疑］，已照决定建置，但建议第二位华文老师复核。详见[全文校对稿](docs/全文校对稿.md)最后一节。
+以下各项已由科任老师定案，游戏已照此建置。详见[全文校对稿](docs/全文校对稿.md)最后一节。
 
-These were flagged during review, built as decided, but a second Chinese Language teacher should look at them. See the last section of the [full text dump](docs/全文校对稿.md).
+These were settled by the subject teacher and the game is built accordingly. See the last section of the [full text dump](docs/全文校对稿.md).
 
-1. 第二关反问句判断中「人生就像一场盛大的演出……呢？」判为**不是**反问句 —— 这是该版面唯一的否定项，也是鉴别点
-2. 第二关第1段修辞手法已改为**多选**（排比＋比喻），避开二选一的争议
-3. 第二关三条引语的「意思」为拟答（课本留白）
-4. 第三关俗语题的另两个选项由建置时拟定
+1. 第二关反问句判断中「人生就像一场盛大的演出……呢？」**确认不是反问句** —— 这是该版面唯一的否定项，也是鉴别点
+2. 第二关第1段修辞手法**答案只取「排比」**，「比喻」留作干扰项
+3. 第二关「引用语句配意思」**已整个删去**（原 3 分）—— 三条引语的「意思」是课本留白处的拟答，不是可以据以评分的定本
+4. 第三关「俗语的意思」**已整个删去**（原 1 分）—— 另两个选项未经审定
+5. 第三关第4至5段合并为一张卡，确认可行
+
+因此总分由 40 降为 **36 分**。
 
 ---
 

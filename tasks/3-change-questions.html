@@ -28,8 +28,8 @@
   <span class="num">1</span>
   <h2 class="zh">先看清楚现在有什么</h2>
   <h2 class="en">First, see what's already there</h2>
-  <p class="zh">下载这一份：12 个版面的指示、卡片、答案、干扰项、答后讲解，加上 70 条拼音，全在一页里。</p>
-  <p class="en">Download this: every instruction, card, answer, distractor and explanation across the 12 panels, plus all 70 pinyin entries.</p>
+  <p class="zh">下载这一份：10 个版面的指示、卡片、答案、干扰项、答后讲解，加上 70 条拼音，全在一页里。</p>
+  <p class="en">Download this: every instruction, card, answer, distractor and explanation across the 10 panels, plus all 70 pinyin entries.</p>
   <div class="dl">
     <a class="btn" href="../docs/全文校对稿.md" download>📄 全文校对稿 <span class="sub">Full text dump</span></a>
   </div>
@@ -65,8 +65,8 @@
   q:'题目', opts:['甲','乙','丙'], a:0, e:'…' }</pre>
   </div>
   <div class="note warn">
-    <p class="zh"><b>改了题数就要重算总分。</b>每张可放的卡片 1 分，多选与选择题各 1 分。总分要同时改两个地方：<code>game.html</code> 里的 <code>sendScore(total(), 40)</code>，以及 SLS 组件的 Maximum Marks。两边不一致，后台分数就是错的。</p>
-    <p class="en"><b>Change the item count and you must recalculate the total.</b> Each placeable card is 1 mark; multi and choice are 1 each. Update both <code>sendScore(total(), 40)</code> in <code>game.html</code> and the SLS component's Maximum Marks — if they disagree, the gradebook is wrong.</p>
+    <p class="zh"><b>满分是算出来的，不必手改。</b>每张可放的卡片 1 分，选择题 1 分；<code>MAX</code> 由题库自动算出，删一个版面画面上的分数就跟着变。你唯一要手动做的，是把 <b>SLS 的 Maximum Marks</b> 改成开场画面显示的那个数 —— 两边不一致，后台分数就是错的。</p>
+    <p class="en"><b>The maximum computes itself.</b> Each placeable card is 1 mark, as is each choice question, and <code>MAX</code> is derived from the bank — remove a panel and every displayed total follows. The one manual step is setting the <b>SLS Maximum Marks</b> to the number on the opening screen; if they disagree, the gradebook is wrong.</p>
   </div>
 </div>
 
@@ -83,8 +83,8 @@
 
 必须遵守：
 1. 只改 LEVELS 数组和 RUBY 拼音字典，其他程式码一行都不要动。
-2. 每张可放的卡片值 1 分。改完请告诉我新的总分，并把
-   sendScore(total(), 40) 里的 40 改成新的总分。
+2. 每张可放的卡片值 1 分。满分由 MAX 自动算出，不必改程式；
+   但请告诉我新的总分是多少，我要去改 SLS 的 Maximum Marks。
 3. 卡片文字要短 —— 这是 450px 高的框，一张卡最多两行。
 4. 干扰项请从「另一个例子」里取，不要凭空编造：
    要测的是学生有没有把两个例子分清楚。
@@ -111,7 +111,7 @@ python3 tools/build-pinyin.py   # 网页那份拼音字典</pre>
   <h2 class="zh">改完自己走一遍</h2>
   <h2 class="en">Check it yourself before class</h2>
   <ul>
-    <li class="zh">12 个版面都打得开，卡片放得进格子</li>
+    <li class="zh">10 个版面都打得开，卡片放得进格子</li>
     <li class="en">Every panel opens and every card can be placed</li>
     <li class="zh">每个版面都<b>不需要卷动</b> —— 卡片太长就分行或改短</li>
     <li class="en">No panel needs scrolling — shorten a card if one does</li>
