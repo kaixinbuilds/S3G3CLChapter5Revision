@@ -2161,7 +2161,25 @@ function scrWelcomeShow(){
   $('wGo').addEventListener('click', ()=>{
     SFX.wake();
     if(BGM.on && SFX.on) BGM.start();
-    resume ? scrMenuShow() : scrNameShow();
+    if(resume) return scrMenuShow();
+    /* 姓名班级那一页，连同上面「在 SLS 里作答」「截图交到 SLS」两条规矩，
+       只有 SLS 版才说得通。公开网址上的学生没有 SLS 可以回去作答，
+       也没有地方交那张截图 —— 还先被要走姓名与班级，问了等于白问。
+       所以网页版直接跳到选角色；SLS 版照旧。
+
+       The name-and-class page, and the two rules on it about answering inside
+       SLS and submitting a screenshot to SLS, only make sense in the SLS build.
+       A student on the public link has no SLS to answer inside and nowhere to
+       submit the screenshot, and is asked for their name and class first for no
+       purpose at all. So the web build goes straight to the character picker;
+       the SLS build is unchanged. */
+    if(!XAPI.everSLS){
+      // 凭证上的称呼，与 SLS 版把姓名栏留空时用的是同一个预设
+      // The name on the certificate — the same default the SLS build uses for a blank field
+      if(!S.name){ S.name = '同学'; save(); }
+      return scrAvShow();
+    }
+    scrNameShow();
   });
 }
 
